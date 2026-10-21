@@ -72,20 +72,28 @@
     background: var(--white);
   }
 
-  /* Pie del hero: los dispositivos y su sombra se funden con el blanco antes del borde inferior. El hero
-     recorta lo que sale de su caja y, con la franja blanca de la cortina de Filosofía debajo, ese recorte
-     se vería como una línea; así la última fila del hero es del mismo blanco que la franja. Encima de la
-     escena y debajo del texto, sin eventos de puntero. */
-  .js .hero::after {
+  /* Pie del hero mientras se abre la cortina de Filosofía: el hero recorta lo que sale de su caja y, con la
+     franja blanca de esa cortina debajo, el recorte de la sombra (o del teléfono) se vería como una línea.
+     Filosofía, que se pinta encima del hero, pone justo sobre su borde un degradado de blanco transparente
+     a blanco: la sombra se funde con la franja. Solo existe mientras hay franja (opacidad 1 hasta c = 0,9 y
+     0 en c = 1): con la cortina abierta, sin JS o con movimiento reducido todo queda como antes. */
+  .js .philosophy::after {
     content: '';
     position: absolute;
     right: 0;
-    bottom: 0;
+    bottom: 100%;
     left: 0;
-    z-index: 1;
-    height: clamp(1.75rem, 6vw, 3rem);
-    background: linear-gradient(rgb(255 255 255 / 0), var(--white) calc(100% - 2px));
+    height: 3rem;
+    background: linear-gradient(rgb(255 255 255 / 0), var(--white));
+    opacity: clamp(0, (1 - var(--c, 1)) * 10, 1);
     pointer-events: none;
+  }
+
+  /* En móvil el teléfono queda a 11–36 px del borde: un degradado corto no lo empaña */
+  @media (max-width: 47.99em) {
+    .js .philosophy::after {
+      height: 1rem;
+    }
   }
 
   /* Titulares de sección: pendientes (por debajo de la ventana al asentarse la carga) quedan ocultos con
@@ -118,7 +126,7 @@
    completa (mismos selectores, o más específicos, que las reglas que anulan: gana el orden) */
 @media print {
   .js [data-curtain]::before,
-  .js .hero::after {
+  .js .philosophy::after {
     content: none;
   }
 

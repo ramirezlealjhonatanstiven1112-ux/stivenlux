@@ -128,13 +128,19 @@ groupLines(tops, maxLines = 6, tolerance = 1):            // tops = posición ve
   devolver lines                                          // array de arrays de índices de palabra
 
 revealTiming(lineCount, mobile):
-  si mobile: devolver { duration: 500, stagger: 0 }       // RF-15: un bloque, ≤ 600 ms
+  si mobile: devolver { duration: 480, stagger: 0 }       // RF-15: un bloque, ≤ 600 ms
   k = min(max(lineCount, 1), 6)
-  stagger = 90                                            // dentro de 80–120 ms
-  duration = min(700, 880 - (k - 1) * stagger)            // total = duration + (k-1)·stagger ≤ 880 ms
-  devolver { duration, stagger }                          // margen de 20 ms al fotograma de arranque
+  stagger = 80                                            // dentro de 80–120 ms
+  duration = min(700, 780 - (k - 1) * stagger)            // total = duration + (k-1)·stagger ≤ 780 ms
+  devolver { duration, stagger }                          // margen de 120 ms para el arranque
 ```
-Tiempos resultantes en escritorio: 1 línea 700 ms · 2 → 790 · 3 → 880 · 4 → 610 + 270 = 880 · 6 → 430 + 450 = 880.
+Tiempos resultantes en escritorio: 1 línea 700 ms · 2 → 780 · 3 → 620 + 160 = 780 · 4 → 540 + 240 = 780 ·
+6 → 380 + 400 = 780. Móvil: 480 ms.
+> **Corrección tras la validación (vuelta 1)**: RF-14 y RF-15 cuentan desde que se cumple la condición, y el
+> revelado arranca unos fotogramas después del scroll (8–64 ms medidos; más con la máquina cargada). Con
+> 880 ms planificados, Contacto (3 líneas) llegaba a terminar a 905–910 ms del scroll. Ahora se planifica
+> con 120 ms de margen (780 y 480 ms), y el e2e mide el fin desde el `scrollTo` que cumple la condición, sin
+> un límite aparte para el arranque.
 
 ### `budget.js`
 ```
@@ -281,7 +287,7 @@ revealTitle(h, mobile):
 - **Tablet (768–1024 px, incluye 844×390)**: misma tabla; la escena ya es más ancha (`70vw`).
 - **Cortinas**: marco del tono anterior en los cuatro lados; en Proyectos solo arriba y abajo (`--px: 0px`).
   La franja superior a 1440 px es de 13 rem − 8 px = 200 px con c = 0.
-- **Titulares**: línea a línea, 90 ms de escalonado, ≤ 880 ms en total.
+- **Titulares**: línea a línea, 80 ms de escalonado, ≤ 780 ms planificados (≤ 900 ms desde el scroll).
 
 ### Móvil (< 768 px; proyecto `movil` = Pixel 7 de Playwright)
 > La spec cita el Pixel 7 como 412×915 (pantalla); la ventana del descriptor de Playwright es más baja
@@ -297,7 +303,7 @@ revealTitle(h, mobile):
 
 - La capa intermedia sigue oculta en móvil. El `overflow: hidden` del hero evita desplazamiento horizontal.
 - Cortinas con `rise = 0,4`: franja superior 6 rem − 8 px = 88 px y laterales `--gutter` − 8 px = 12 px.
-- Titulares: un único bloque desde una máscara, 500 ms, sin medir líneas.
+- Titulares: un único bloque desde una máscara, 480 ms, sin medir líneas.
 - Sin inclinación (sin puntero fino), como hoy.
 
 ### Alturas < 500 px
@@ -352,6 +358,23 @@ de impresión. Notas de T9:
   no tapa texto, pulsables ni el indicador de foco (`outline` 2 px + `offset` 4 px = 6 px < 8 px) (RF-9,
   RF-21). El fondo propio de la sección no cambia, así que el contraste del contenido tampoco.
 - Los `@property` permiten que el test lea los grosores ya resueltos en px con `getComputedStyle(el, '::before')`.
+- **Corrección tras la validación (vuelta 1), filete con DPR fraccionario o 3**: con `clip-path`, Chromium
+  pinta el `::before` con su borde suavizado en la posición real, mientras el fondo de la sección se ajusta
+  al píxel; con el borde a mitad de un píxel de dispositivo (DPR 1,25, 1,5, 2,625, 3) la fila del borde
+  quedaba a medio cubrir y dejaba ver el fondo propio (filete gris de 1–2 px a todo el ancho). Ahora el
+  `::before` empieza 2 px más arriba (`inset: -2px 0 0`) y su hueco empieza en `--fx + --ft`, con
+  `--fx: min(2px, (1 − c) · 100000px)`: 2 px mientras la cortina está en curso (la fila del borde queda
+  entera del tono anterior y el borde suavizado cae sobre la sección anterior, del mismo tono) y 0 con
+  c = 1 (el hueco ocupa toda la caja y no se pinta nada, como antes). Solo cambia `clip-path`.
+- **Corrección tras la validación (vuelta 1), pie del hero**: el hero recorta lo que sale de su caja
+  (`overflow: hidden`, necesario contra el scroll horizontal) y, al bajar, el teléfono y la sombra llegan a
+  su borde inferior; con la franja blanca de la cortina de Filosofía debajo, el recorte se veía como una
+  línea. `.js .hero::after` (bajo `no-preference`, `content: none` al imprimir) es un degradado de blanco
+  transparente a blanco de `clamp(1.75rem, 6vw, 3rem)` de alto que llega al blanco 2 px antes del borde,
+  encima de la escena (`z-index: 1`, después en el árbol) y debajo del texto (`z-index: 2`), sin eventos de
+  puntero. Descartado dejar desbordar la sombra (`overflow-x: clip` / `overflow-clip-margin`): Filosofía se
+  pinta después y la taparía igual, y subir el hero por encima haría que los dispositivos (que a 1366×600,
+  844×390 y en móvil cruzan el borde) pisaran Filosofía.
 - Palabras de filosofía en `sections.css`: `--t: calc(var(--w, 1) * var(--n) - var(--i, 0))`. Con
   `--w = (p − 0,12)/0,38` es la fórmula de la spec 000; sin JS, `--w = 1` → todo visible.
 
@@ -361,8 +384,8 @@ de impresión. Notas de T9:
 - Todo bajo `html.js` y `prefers-reduced-motion: no-preference`; el estado final es el de por defecto
   (`var(--c, 1)`, `var(--w, 1)`, `var(--hero-p, 0)` = reposo).
 - Un único rAF y un único listener de scroll en `scroll-fx.js`; nada se anima sin scroll salvo el revelado
-  (una vez por titular, ≤ 880 ms) y la vuelta a neutro de la inclinación (500 ms). Nada infinito.
-- Móvil: revelado de 500 ms (≈ 0,7× de 700 ms), un solo elemento; amplitudes de salida menores.
+  (una vez por titular, ≤ 780 ms planificados) y la vuelta a neutro de la inclinación (500 ms). Nada infinito.
+- Móvil: revelado de 480 ms (≈ 0,7× de 700 ms), un solo elemento; amplitudes de salida menores.
 - Curvas: `--ease-out` en el revelado (`@keyframes hero-line` reutilizado, sin keyframes nuevos).
 - **Ampliación de la skill (autorizada; tarea T1)**. Texto propuesto para la regla del scroll:
   > Los efectos leen `--p`, `--e`, `--hero-p` y, en las secciones con frontera de tono (`data-curtain`), el
@@ -394,7 +417,8 @@ de impresión. Notas de T9:
    altera el layout, mantiene el texto en el árbol de accesibilidad y en la búsqueda del navegador, y es una
    propiedad permitida por motion-rules.
 6. **Tope de 6 máscaras** en vez de reducir la duración de cada línea sin límite. Motivo: con 80–120 ms de
-   escalonado y 900 ms de total, más de 6 líneas dejarían menos de 400 ms por línea.
+   escalonado y 900 ms de total, más de 6 líneas dejarían menos de 400 ms por línea (con los 780 ms
+   planificados tras la validación, 6 líneas dejan 380 ms por línea y 7 dejarían 300).
 7. **Esperar a las fuentes con la promesa que ya usa el hero** (`document.fonts.ready` o 1,2 s) en vez de un
    `MutationObserver` sobre `is-ready`. Motivo: una sola fuente de verdad y ningún observador extra.
 8. **Tests de esta spec en archivos e2e nuevos** en vez de ampliar `landing.spec.js`. Motivo: los tests de
@@ -460,7 +484,7 @@ Cuando se implemente la spec 002, su plan fijará la nueva base.
 | `curtain.test.js`: `curtainRange` con 0,6/0,4, tramo acortado (end = maxScroll), progreso 1 en maxScroll, sección visible con scroll 0 | RF-7, RF-11 |
 | `curtain.test.js`: `wordsProgress` = 0 antes de la cortina, 1 en el centro, caso textEnd ≤ curtainEnd; `legacyWordsProgress` igual a la curva de la spec 000; `gated` | RF-12, RF-13 |
 | `reveal.test.js`: `seenOnSettle` (1 px dentro, por encima, justo en el borde) | RF-16, RF-19 |
-| `reveal.test.js` (T9): `settleCheck` — sin carga solo decide el tope (999 → no, 1000 → sí, `wait` = lo que falta); con carga, 200 ms de calma desde `loadedAt` o desde `lastMove` (lo posterior); un movimiento reinicia la calma; tope de 1 s aunque haya movimiento; `wait` ≤ lo que falta al tope; carga anterior al script (`loadedAt` = `start`) | RF-12, RF-16, RF-19 |
+| `reveal.test.js` (T9): `settleCheck` — sin carga solo decide el tope (999 → no, 1000 → sí, `wait` = lo que falta); con carga, `quiet` ms de calma desde `loadedAt` o desde `lastMove` (lo posterior; los casos fijan `quiet: 200` explícito y un test aparte comprueba `SETTLE` = `{ quiet: 400, max: 1000 }`, el valor en uso); un movimiento reinicia la calma; tope de 1 s aunque haya movimiento; `wait` ≤ lo que falta al tope; carga anterior al script (`loadedAt` = `start`) | RF-12, RF-16, RF-19 |
 | `reveal.test.js`: `shouldReveal` (85 %, cortina < 1, fuera de la ventana, `atEnd`, `ready`) | RF-11, RF-12, RF-13, RF-14 |
 | `reveal.test.js`: `groupLines` (una línea, varias, `<br>` simulado, tolerancia, fusión desde la 6.ª) | RF-14 |
 | `reveal.test.js`: `revealTiming` (escalonado 80–120, total ≤ 900 de 1 a 10 líneas; móvil sin escalonado ≤ 600) | RF-14, RF-15 |
@@ -488,11 +512,14 @@ Ayudas en `tests/e2e/support/motion.js`: `open(page)` (como el de la spec 000, r
 | `curtains` · final de página: Contacto con c = 1; ventana muy alta (1440×2400) con tramo acortado | 1440×900, 1440×2400 | RF-11 |
 | `curtains` · cargar con Servicios a la vista, subir por encima y volver: la cortina se cierra y se reabre | 1440×900 | RF-7 |
 | `curtains` · Tab por todos los enfocables: anillo (caja + 6 px) dentro del plano y por encima del hero | escritorio | RF-21 |
+| `curtains` (validación) · CTA de Contacto enfocados con `preventScroll` con su cortina a 0 y a 0,5, sin llegar al final: indicador visible y anillo dentro del plano | 1440×900, móvil | RF-21 |
+| `curtains` (validación) · franja superior de cada frontera a c = 0,25/0,5/0,75, de 1 px por encima del borde a 1 px antes del plano, a todo el ancho: tono anterior ±2 en cada píxel de dispositivo | DPR 1,25 (1440×900), 1,5 (1366×768), 2,625 (Pixel 7), 3 (iPhone 13) | RF-8 |
+| `curtains` (validación) · borde inferior del hero con la cortina de Filosofía en curso: ningún salto > 4 niveles entre filas de dispositivo de 4 px por encima a 2 px por debajo | 1440×900, móvil | HU-1, RF-8 |
 | `reveal` · Filosofía: c = 0,9 → titular pendiente y palabras a 0,18; c = 1 → revela; palabras a 1 en el centro | 1440×900, móvil | RF-12 |
 | `reveal` · Proyectos: c = 0,9 → titular pendiente y primer escenario sin abrir | 1440×900, 1366×600, 844×390, móvil | RF-13 |
-| `reveal` · nº de máscaras = nº de líneas de `Range.getClientRects()` medido justo antes; escalonado 80–120 ms; fin ≤ 900 ms (con `getAnimations()`) | 1440×900 | RF-14 |
+| `reveal` · nº de máscaras = nº de líneas de `Range.getClientRects()` medido justo antes; escalonado 80–120 ms; fin ≤ 900 ms desde el `scrollTo` que cumple la condición, arranque incluido (`startTime` + `endTime` de `getAnimations()`) | 1440×900 | RF-14 |
 | `reveal` · antes del revelado: cambiar ancho (1440 → 1100) y `font-size` raíz (125 %) → máscaras = líneas nuevas | escritorio | RF-14 |
-| `reveal` · titular con > 6 líneas (`font-size` raíz 200 %): 6 máscaras y ≤ 900 ms | escritorio | RF-14 |
+| `reveal` · titular con > 6 líneas (`font-size` raíz 200 %): 6 máscaras y ≤ 900 ms desde el scroll | escritorio | RF-14 |
 | `reveal` · móvil: 1 máscara, sin escalonado, ≤ 600 ms | móvil | RF-15 |
 | `reveal` · subir y bajar: ninguna animación nueva; tras revelar, cambiar ancho: HTML original y sin máscaras | 1440×900, móvil | RF-16 |
 | `reveal` · nombre accesible igual antes/durante/después; altura del titular y `top` del siguiente elemento ±1 px | 1440×900, móvil | RF-17 |
