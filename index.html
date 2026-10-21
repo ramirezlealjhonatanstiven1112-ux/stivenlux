@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stiven Lux — Diseño y desarrollo web premium</title>
+    <meta
+      name="description"
+      content="Stiven Lux diseña y desarrolla experiencias web a medida para marcas que quieren destacar. No hacemos lo de siempre."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Stiven Lux" />
+    <meta property="og:title" content="Stiven Lux — No hacemos lo de siempre" />
+    <meta
+      property="og:description"
+      content="Diseño y desarrollo web premium para marcas que no vinieron a pasar desapercibidas."
+    />
+    <!-- PENDIENTE: og:image (1200×630) y og:url cuando exista el dominio definitivo. -->
+    <meta name="twitter:card" content="summary" />
+
+    <script>
+      // Activa las animaciones solo con JS y garantiza que el hero se muestre aunque falle el módulo.
+      document.documentElement.classList.add('js');
+      setTimeout(() => document.documentElement.classList.add('is-ready'), 2500);
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <include src="nav.html"></include>
+
+    <main id="contenido" tabindex="-1">
+      <include src="sections/hero.html"></include>
+      <include src="sections/philosophy.html"></include>
+      <include src="sections/work.html"></include>
+      <include src="sections/services.html"></include>
+      <include src="sections/process.html"></include>
+      <include src="sections/contact.html"></include>
+    </main>
+
+    <include src="footer.html"></include>
+  </body>
+</html>

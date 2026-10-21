@@ -3,6 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { site } from './src/config/site.js';
+import { whatsappBuildWarning } from './src/lib/whatsapp.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const partialsDir = resolve(root, 'src/partials');
@@ -42,12 +43,9 @@ function whatsappCheck() {
     name: 'stivenlux:whatsapp-check',
     apply: 'build',
     buildStart() {
-      if (!site.whatsapp.number) {
-        this.warn(
-          'WhatsApp sin configurar: define site.whatsapp.number en src/config/site.js. ' +
-            'Mientras tanto los CTA de WhatsApp apuntan a la sección #contacto.',
-        );
-      }
+      // Misma validación que el navegador (buildWhatsappUrl): vacío o inválido → aviso (RF-3)
+      const warning = whatsappBuildWarning(site.whatsapp.number);
+      if (warning) this.warn(warning);
     },
   };
 }

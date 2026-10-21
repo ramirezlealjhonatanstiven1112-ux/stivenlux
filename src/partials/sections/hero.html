@@ -1,0 +1,31 @@
+<section class="hero" id="inicio" data-theme="light" aria-labelledby="hero-title">
+  <div class="hero__copy">
+    <h1 class="hero__title" id="hero-title">
+      <span class="line"><span>No hacemos</span></span>
+      <span class="line"><span>lo de siempre.</span></span>
+    </h1>
+    <p class="hero__lead">
+      Diseñamos y desarrollamos experiencias web a medida para marcas que quieren destacar, no encajar.
+    </p>
+    <div class="hero__actions">
+      <a class="btn" href="#contacto" data-whatsapp>Iniciar proyecto por WhatsApp</a>
+      <a class="link" href="#proyectos">Ver proyectos</a>
+    </div>
+  </div>
+
+  <!--
+    Escena del hero: ensamblaje progresivo de mockups en HTML/CSS/JS (alternativa web en vivo).
+    La versión en video está en video/hero/ (HyperFrames). Ver PROJECT_BRIEF.md.
+  -->
+  <div class="hero__stage" data-hero-stage aria-hidden="true">
+    <div class="hero__layer hero__layer--back" data-depth="0.35">
+      <include src="devices/browser.html" class="hero__device hero__device--back" url="maisonaurele.concept" screen="fashion"></include>
+    </div>
+    <div class="hero__layer hero__layer--mid" data-depth="0.7">
+      <include src="devices/browser.html" class="hero__device hero__device--mid" url="kairo.concept" screen="tech"></include>
+    </div>
+    <div class="hero__layer hero__layer--front" data-depth="1.1">
+      <include src="devices/phone.html" class="hero__device hero__device--front" screen="services"></include>
+    </div>
+  </div>
+</section>
