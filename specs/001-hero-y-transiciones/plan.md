@@ -367,14 +367,19 @@ de impresión. Notas de T9:
   entera del tono anterior y el borde suavizado cae sobre la sección anterior, del mismo tono) y 0 con
   c = 1 (el hueco ocupa toda la caja y no se pinta nada, como antes). Solo cambia `clip-path`.
 - **Corrección tras la validación (vuelta 1), pie del hero**: el hero recorta lo que sale de su caja
-  (`overflow: hidden`, necesario contra el scroll horizontal) y, al bajar, el teléfono y la sombra llegan a
-  su borde inferior; con la franja blanca de la cortina de Filosofía debajo, el recorte se veía como una
-  línea. `.js .hero::after` (bajo `no-preference`, `content: none` al imprimir) es un degradado de blanco
-  transparente a blanco de `clamp(1.75rem, 6vw, 3rem)` de alto que llega al blanco 2 px antes del borde,
-  encima de la escena (`z-index: 1`, después en el árbol) y debajo del texto (`z-index: 2`), sin eventos de
-  puntero. Descartado dejar desbordar la sombra (`overflow-x: clip` / `overflow-clip-margin`): Filosofía se
-  pinta después y la taparía igual, y subir el hero por encima haría que los dispositivos (que a 1366×600,
-  844×390 y en móvil cruzan el borde) pisaran Filosofía.
+  (`overflow: hidden`, necesario contra el scroll horizontal) y, al bajar, la sombra del teléfono (y a
+  1366×600, 844×390 o en iPhone, el propio dispositivo) llega a su borde inferior; con la franja blanca de la
+  cortina de Filosofía debajo, el recorte se veía como una línea. `.js .philosophy::after` (bajo
+  `no-preference`, `content: none` al imprimir), pegado encima del borde superior de Filosofía
+  (`bottom: 100%`), es un degradado de blanco transparente a blanco (completo 2 px antes del borde, donde
+  empieza la solapa del marco) de 3 rem (1 rem en móvil, para no empañar el teléfono, que queda a 11–36 px
+  del borde). Filosofía se pinta después del hero, así que el degradado queda encima de la sombra. Su
+  `opacity` es `clamp(0, (1 − c) · 10, 1)`: 1 hasta c = 0,9 y 0 en c = 1, así que solo existe mientras hay
+  franja blanca; con la cortina abierta, sin JS o con movimiento reducido el borde queda como en la spec 000.
+  Descartados: dejar desbordar la sombra (`overflow-x: clip` / `overflow-clip-margin`), porque Filosofía se
+  pinta después y la taparía igual, y subir el hero por encima haría que los dispositivos pisaran Filosofía;
+  y un degradado fijo en el propio hero, porque con c = 1 dejaba una banda blanca entre el teléfono y el
+  negro de Filosofía en móvil.
 - Palabras de filosofía en `sections.css`: `--t: calc(var(--w, 1) * var(--n) - var(--i, 0))`. Con
   `--w = (p − 0,12)/0,38` es la fórmula de la spec 000; sin JS, `--w = 1` → todo visible.
 

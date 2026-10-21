@@ -75,7 +75,8 @@
   /* Pie del hero mientras se abre la cortina de Filosofía: el hero recorta lo que sale de su caja y, con la
      franja blanca de esa cortina debajo, el recorte de la sombra (o del teléfono) se vería como una línea.
      Filosofía, que se pinta encima del hero, pone justo sobre su borde un degradado de blanco transparente
-     a blanco: la sombra se funde con la franja. Solo existe mientras hay franja (opacidad 1 hasta c = 0,9 y
+     a blanco (completo 2 px antes del borde, donde empieza la solapa del marco): la sombra se funde con la
+     franja. Solo existe mientras hay franja (opacidad 1 hasta c = 0,9 y
      0 en c = 1): con la cortina abierta, sin JS o con movimiento reducido todo queda como antes. */
   .js .philosophy::after {
     content: '';
@@ -84,7 +85,7 @@
     bottom: 100%;
     left: 0;
     height: 3rem;
-    background: linear-gradient(rgb(255 255 255 / 0), var(--white));
+    background: linear-gradient(rgb(255 255 255 / 0), var(--white) calc(100% - 2px));
     opacity: clamp(0, (1 - var(--c, 1)) * 10, 1);
     pointer-events: none;
   }
