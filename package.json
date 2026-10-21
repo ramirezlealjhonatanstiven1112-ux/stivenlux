@@ -1,0 +1,26 @@
+{
+  "name": "stivenlux",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Landing page oficial de Stiven Lux — diseño y desarrollo web premium.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.1.0",
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0"
+  }
+}
