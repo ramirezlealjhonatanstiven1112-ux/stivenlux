@@ -39,14 +39,19 @@
     --fb: calc((1 - var(--c, 1)) * max(0px, var(--pb) - 8px));
     --fl: calc((1 - var(--c, 1)) * max(0px, var(--px) - 8px));
     --fr: var(--fl);
+    /* Solapa de 2 px sobre la sección anterior mientras la cortina está en curso (0 en c = 1). Con DPR
+       fraccionario o 3 el borde de la sección cae a mitad de un píxel de dispositivo: sin solapa, esa fila
+       queda a medio cubrir y deja ver el fondo propio como un filete. Con ella, la fila del borde queda
+       entera del tono anterior y el borde suavizado del marco cae sobre la sección anterior, del mismo tono. */
+    --fx: min(2px, (1 - var(--c, 1)) * 100000px);
     content: '';
     position: absolute;
-    inset: 0;
+    inset: -2px 0 0;
     z-index: -1;
     pointer-events: none;
     background: var(--black);
-    /* El rectángulo exterior sale 1 px de la caja: el borde visible es el de la caja, ajustado al píxel
-       como el fondo de las secciones (si no, queda un filete gris en la frontera) */
+    /* El rectángulo exterior sale 1 px de la caja; el plano descubierto empieza en el borde de la sección
+       más su franja (la caja empieza 2 px más arriba). En c = 1 el hueco ocupa toda la caja: no se pinta nada. */
     clip-path: polygon(
       evenodd,
       -1px -1px,
@@ -54,17 +59,33 @@
       calc(100% + 1px) calc(100% + 1px),
       -1px calc(100% + 1px),
       -1px -1px,
-      var(--fl) var(--ft),
+      var(--fl) calc(var(--fx) + var(--ft)),
       var(--fl) calc(100% - var(--fb)),
       calc(100% - var(--fr)) calc(100% - var(--fb)),
-      calc(100% - var(--fr)) var(--ft),
-      var(--fl) var(--ft)
+      calc(100% - var(--fr)) calc(var(--fx) + var(--ft)),
+      var(--fl) calc(var(--fx) + var(--ft))
     );
   }
 
   /* Las secciones oscuras vienen de una clara */
   .js [data-curtain][data-theme='dark']::before {
     background: var(--white);
+  }
+
+  /* Pie del hero: los dispositivos y su sombra se funden con el blanco antes del borde inferior. El hero
+     recorta lo que sale de su caja y, con la franja blanca de la cortina de Filosofía debajo, ese recorte
+     se vería como una línea; así la última fila del hero es del mismo blanco que la franja. Encima de la
+     escena y debajo del texto, sin eventos de puntero. */
+  .js .hero::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    height: clamp(1.75rem, 6vw, 3rem);
+    background: linear-gradient(rgb(255 255 255 / 0), var(--white) calc(100% - 2px));
+    pointer-events: none;
   }
 
   /* Titulares de sección: pendientes (por debajo de la ventana al asentarse la carga) quedan ocultos con
@@ -96,7 +117,8 @@
    escenarios sin recorte, titulares visibles (también a medio revelar) y palabras de filosofía a opacidad
    completa (mismos selectores, o más específicos, que las reglas que anulan: gana el orden) */
 @media print {
-  .js [data-curtain]::before {
+  .js [data-curtain]::before,
+  .js .hero::after {
     content: none;
   }
 

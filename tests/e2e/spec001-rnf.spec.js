@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdirSync } from 'node:fs';
-import { heroEntranceDone, open, scrollToCurtain, scrollToHeroProgress, scrollToY } from './support/motion.js';
+import { animationsDone, heroEntranceDone, open, scrollToCurtain, scrollToHeroProgress, scrollToY } from './support/motion.js';
 
 // Requisitos no funcionales de specs/001-hero-y-transiciones/spec.md (estabilidad, nitidez) y RF-22 (axe con
 // movimiento permitido). Las capturas no afirman nada: son para la revisión visual (MEMORY.md y @reviewer).
@@ -91,7 +91,7 @@ test.describe('RF-22 · axe con movimiento permitido (WCAG 2.2 A/AA)', () => {
     await open(page);
     await heroEntranceDone(page);
     expect(await scrollToCurtain(page, 'servicios', 0.5)).toBeCloseTo(0.5, 2);
-    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+    await animationsDone(page);
   }
 
   test('cortina de Servicios a 0,5, menú cerrado: sin infracciones', async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe('RF-22 · axe con movimiento permitido (WCAG 2.2 A/AA)', () => {
     await atHalfCurtain(page);
     await page.locator('[data-menu-toggle]').click();
     await expect(page.locator('[data-menu]')).toHaveCSS('clip-path', 'inset(0px)');
-    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+    await animationsDone(page);
     const { violations } = await new AxeBuilder({ page }).withTags(tags).analyze();
     expect(violations.map((v) => `${v.id} (${v.nodes.length})`)).toEqual([]);
   });
@@ -114,7 +114,7 @@ test.describe('RF-22 · axe con movimiento permitido (WCAG 2.2 A/AA)', () => {
 
 /* Deja terminar las transiciones y animaciones en curso (tono de la barra, revelados) antes de capturar. */
 async function settleAnimations(page) {
-  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+  await animationsDone(page);
 }
 
 function shotDir(testInfo) {

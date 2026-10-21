@@ -46,11 +46,13 @@ export function groupLines(tops, maxLines = 6, tolerance = 1) {
   return lines;
 }
 
-/* Tiempos en ms. Escritorio: 90 ms entre máscaras y total ≤ 880 ms (margen de 20 ms sobre los 900 de
-   RF-14). Móvil: un único bloque sin escalonado en 500 ms (RF-15). */
+/* Tiempos en ms. RF-14 y RF-15 cuentan desde que se cumple la condición y el revelado arranca unos
+   fotogramas después (8–64 ms medidos; más con la máquina cargada): se planifica con 120 ms de margen.
+   Escritorio: 80 ms entre máscaras, 700 ms por línea como máximo y total ≤ 780 ms (de 900).
+   Móvil: un único bloque sin escalonado en 480 ms (de 600; ≈ 0,7× de 700). */
 export function revealTiming(lineCount, mobile) {
-  if (mobile) return { duration: 500, stagger: 0 };
+  if (mobile) return { duration: 480, stagger: 0 };
   const masks = Math.min(Math.max(lineCount, 1), 6);
-  const stagger = 90;
-  return { duration: Math.min(700, 880 - (masks - 1) * stagger), stagger };
+  const stagger = 80;
+  return { duration: Math.min(700, 780 - (masks - 1) * stagger), stagger };
 }

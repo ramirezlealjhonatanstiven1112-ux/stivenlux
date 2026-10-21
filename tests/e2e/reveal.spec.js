@@ -236,8 +236,9 @@ async function accessibleName(page, id) {
   return snapshot.replace(/\s+/g, ' ').trim();
 }
 
-/* Lleva la página a y y, en cuanto aparecen las máscaras, devuelve su número, las animaciones (con el
-   inicio relativo al scroll), el texto visible y la caja del titular y del siguiente elemento. */
+/* Lleva la página a y y, en cuanto aparecen las máscaras, devuelve su número, las animaciones (inicio y
+   fin planificado medidos desde el scroll que cumple la condición), el texto visible y la caja del titular
+   y del siguiente elemento. */
 const trigger = (page, id, y) =>
   page.evaluate(
     async ({ sel, top }) => {
@@ -251,8 +252,8 @@ const trigger = (page, id, y) =>
       const animations = await Promise.all(
         h.getAnimations({ subtree: true }).map(async (a) => {
           await a.ready;
-          const { delay, duration } = a.effect.getComputedTiming();
-          return { name: a.animationName, start: a.startTime - t0, delay, duration };
+          const { delay, duration, endTime } = a.effect.getComputedTiming();
+          return { name: a.animationName, start: a.startTime - t0, end: a.startTime - t0 + endTime, delay, duration };
         }),
       );
       const next = h.nextElementSibling ?? h.parentElement.nextElementSibling;
@@ -284,7 +285,8 @@ async function revealTitle(page, id) {
   return { lines, ...result };
 }
 
-/* Comprueba los tiempos de escritorio: escalonado de 80–120 ms y fin ≤ 900 ms desde el arranque. */
+/* Comprueba los tiempos de escritorio: escalonado de 80–120 ms y fin ≤ 900 ms desde el scroll que cumple la
+   condición (RF-14), con el arranque incluido: no hay un límite aparte para la latencia de arranque. */
 function expectDesktopTiming(id, { masks, animations }) {
   expect(animations.length, `${id}: una animación por máscara`).toBe(masks);
   expect(animations.every((a) => a.name === 'hero-line'), `${id}: animación hero-line`).toBe(true);
@@ -293,10 +295,8 @@ function expectDesktopTiming(id, { masks, animations }) {
     expect(step, `${id}: escalonado entre las líneas ${i} y ${i + 1}`).toBeGreaterThanOrEqual(80);
     expect(step, `${id}: escalonado entre las líneas ${i} y ${i + 1}`).toBeLessThanOrEqual(120);
   }
-  const end = Math.max(...animations.map((a) => a.delay + a.duration));
-  expect(end, `${id}: fin del revelado desde su arranque`).toBeLessThanOrEqual(900);
-  // Arranca con el scroll, sin esperas: unos pocos fotogramas (con varios navegadores en paralelo, ~60 ms)
-  expect(Math.max(...animations.map((a) => a.start)), `${id}: arranque tras el scroll`).toBeLessThanOrEqual(100);
+  expect(Math.min(...animations.map((a) => a.start)), `${id}: arranca después del scroll`).toBeGreaterThanOrEqual(0);
+  expect(Math.max(...animations.map((a) => a.end)), `${id}: fin del revelado desde el scroll`).toBeLessThanOrEqual(900);
 }
 
 const desktopOnly = (testInfo) => test.skip(testInfo.project.name !== 'escritorio', 'Se prueba en escritorio');
@@ -374,8 +374,8 @@ test('RF-15 · móvil · cada titular se revela en un bloque: 1 máscara, sin es
     expect(masks, `${id}: una sola máscara (${lines} líneas)`).toBe(1);
     expect(animations.map((a) => a.name), `${id}: una animación hero-line`).toEqual(['hero-line']);
     expect(animations[0].delay, `${id}: sin escalonado`).toBe(0);
-    expect(animations[0].delay + animations[0].duration, `${id}: fin ≤ 600 ms`).toBeLessThanOrEqual(600);
-    expect(animations[0].start, `${id}: arranque tras el scroll`).toBeLessThanOrEqual(100);
+    expect(animations[0].start, `${id}: arranca después del scroll`).toBeGreaterThanOrEqual(0);
+    expect(animations[0].end, `${id}: fin ≤ 600 ms desde el scroll`).toBeLessThanOrEqual(600);
     await revealDone(page, id);
   }
   expect(multiline, 'hay titulares de varias líneas en móvil').toBeGreaterThan(0);

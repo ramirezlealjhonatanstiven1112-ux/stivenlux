@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { open, heroEntranceDone, scrollToHeroProgress, heroLayers } from './support/motion.js';
+import { open, animationsDone, heroEntranceDone, scrollToHeroProgress, heroLayers } from './support/motion.js';
 
 // Salida del hero ligada al scroll. Cada test indica el RF de specs/001-hero-y-transiciones/spec.md.
 // Las ventanas con tamaño se prueban desde el proyecto `escritorio`; «móvil» es la ventana del
@@ -230,7 +230,7 @@ for (const win of only(['1440×900'])) {
     await page.mouse.move(720, 450);
     await page.mouse.move(150, 150, { steps: 5 });
     await expect.poll(async () => (await stageTilt(page)).tilt).toBeGreaterThan(TILTED);
-    await page.evaluate(() => Promise.all(document.querySelector('[data-hero-stage]').getAnimations().map((a) => a.finished)));
+    await animationsDone(page, '[data-hero-stage]');
     expect((await stageTilt(page)).tilt, 'inclinación de partida').toBeGreaterThan(0.03);
 
     // Al pasar de 0, vuelve a neutro en ≤ 600 ms desde el desplazamiento

@@ -1,6 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
 import {
   open,
+  pixelBand,
+  scrollToHeroProgress,
   scrollToY,
   curtainRangeOf,
   expectedCurtain,
@@ -268,6 +270,103 @@ test('RF-21 · al tabular, el anillo de foco queda dentro del plano y por encima
   testInfo.annotations.push({ type: 'enfocables en secciones', description: inSections.join(' · ') });
   expect(checked, 'enfocables comprobados').toBeGreaterThanOrEqual(3);
   expect(inSections.length, 'enfocables dentro de secciones con cortina').toBeGreaterThanOrEqual(1);
+});
+
+/* RF-21 con la cortina en curso: los CTA de Contacto se enfocan sin desplazar la página (preventScroll,
+   tras un Tab para que el foco sea de teclado y se vea su indicador) con la cortina a 0 y a 0,5, sin llegar
+   al final de la página, y su anillo queda dentro del plano descubierto. */
+for (const target of [0, 0.5]) {
+  test(`RF-21 · con la cortina de Contacto a ${target}, el anillo de foco de sus CTA queda dentro del plano`, async ({ page }) => {
+    const errors = await open(page);
+    await page.keyboard.press('Tab');
+    expect(await scrollToCurtain(page, 'contacto', target)).toBeCloseTo(target, 2);
+    const { y, maxScroll } = await curtainRangeOf(page, 'contacto');
+    expect(y, 'sin llegar al final de la página').toBeLessThan(maxScroll - 1);
+    const count = await page.evaluate(
+      () => [...document.querySelectorAll('#contacto a[href], #contacto button, #contacto [tabindex]')].filter((el) => el.getClientRects().length).length,
+    );
+    expect(count, 'CTA de Contacto').toBeGreaterThanOrEqual(1);
+
+    for (let i = 0; i < count; i++) {
+      const focused = await page.evaluate((index) => {
+        const el = [...document.querySelectorAll('#contacto a[href], #contacto button, #contacto [tabindex]')].filter((e) => e.getClientRects().length)[index];
+        el.focus({ preventScroll: true });
+        const r = el.getBoundingClientRect();
+        return {
+          label: el.textContent.trim(),
+          visible: el.matches(':focus-visible') && window.getComputedStyle(el).outlineStyle !== 'none',
+          y: window.scrollY,
+          rect: { top: r.top, right: r.right, bottom: r.bottom, left: r.left },
+        };
+      }, i);
+      expect(focused.visible, `${focused.label}: indicador de foco visible`).toBe(true);
+      expect(focused.y, `${focused.label}: el foco no desplaza la página`).toBe(y);
+      expect(await waitCurtainApplied(page, 'contacto')).toBeCloseTo(target, 2);
+      const p = planeOf(await frame(page, 'contacto'));
+      const r = focused.rect;
+      const label = `${focused.label} con c = ${target}`;
+      expect(r.top - RING, `${label}: arriba`).toBeGreaterThanOrEqual(p.top - 1);
+      expect(r.left - RING, `${label}: izquierda`).toBeGreaterThanOrEqual(p.left - 1);
+      expect(r.bottom + RING, `${label}: abajo`).toBeLessThanOrEqual(p.bottom + 1);
+      expect(r.right + RING, `${label}: derecha`).toBeLessThanOrEqual(p.right + 1);
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+/* RF-8 con cualquier densidad de píxeles. Con DPR fraccionario o 3 el borde superior de una sección cae a
+   mitad de un píxel de dispositivo; la fila del borde no puede quedar a medio cubrir (dejaría ver el fondo
+   propio como un filete). Se miran todas las filas de dispositivo desde 1 px por encima del borde hasta
+   1 px antes del plano descubierto, a todo el ancho: todas del tono anterior. Contextos propios con
+   browser.newContext, así que se prueba solo desde el proyecto `escritorio`. */
+const DENSITIES = [
+  { name: 'DPR 1,25 (1440×900)', options: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1.25 } },
+  { name: 'DPR 1,5 (1366×768)', options: { viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1.5 } },
+  { name: 'DPR 2,625 (Pixel 7)', options: devices['Pixel 7'] },
+  { name: 'DPR 3 (iPhone 13)', options: devices['iPhone 13'] },
+];
+
+for (const density of DENSITIES) {
+  test(`RF-8 · ${density.name} · la franja superior de cada cortina es del tono anterior, también en la fila del borde`, async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name !== 'escritorio', 'Contextos propios: se prueba una vez');
+    // eslint-disable-next-line no-unused-vars
+    const { defaultBrowserType, ...options } = density.options;
+    const context = await browser.newContext({ ...options, baseURL: testInfo.project.use.baseURL });
+    const page = await context.newPage();
+    const errors = await open(page);
+    expect(await page.evaluate(() => window.devicePixelRatio)).toBe(options.deviceScaleFactor);
+    for (const { id, prev } of BORDERS) {
+      for (const target of [0.25, 0.5, 0.75]) {
+        const c = await scrollToCurtain(page, id, target);
+        const f = await frame(page, id);
+        expect(f.ft, `${id} con c = ${c}: hay franja`).toBeGreaterThan(4);
+        const band = await pixelBand(page, { from: f.rect.top - 1, to: f.rect.top + f.ft - 1, ref: prev === 'light' ? 255 : 0 });
+        expect(band.worst, `${id} con c = ${c}: franja uniforme (peor píxel ${JSON.stringify(band.at)})`).toBeLessThanOrEqual(2);
+      }
+    }
+    expect(errors).toEqual([]);
+    await context.close();
+  });
+}
+
+/* HU-1 y RF-8: el hero recorta lo que sale de su caja. Mientras la cortina de Filosofía está en curso, su
+   franja blanca queda justo debajo, así que la sombra (o el propio dispositivo) no puede terminar en un
+   corte: entre 4 px por encima del borde del hero y 2 px por debajo, ninguna fila de dispositivo cambia más
+   de 4 niveles respecto a la anterior. */
+test('HU-1 · la sombra de los dispositivos no se corta en el borde del hero mientras se abre la cortina de Filosofía', async ({ page }) => {
+  const errors = await open(page);
+  let checked = 0;
+  for (const p of [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]) {
+    await scrollToHeroProgress(page, p);
+    const c = await waitCurtainApplied(page, 'filosofia');
+    const { bottom, vh } = await page.evaluate(() => ({ bottom: document.querySelector('.hero').getBoundingClientRect().bottom, vh: window.innerHeight }));
+    if (c <= 0 || c >= 1 || bottom > vh - 4) continue;
+    const band = await pixelBand(page, { from: bottom - 4, to: bottom + 2 });
+    expect(band.worst, `progreso ${p} (cortina ${c.toFixed(2)}): sin corte en el borde (${JSON.stringify(band.at)})`).toBeLessThanOrEqual(4);
+    checked++;
+  }
+  expect(checked, 'posiciones con la cortina de Filosofía en curso').toBeGreaterThanOrEqual(2);
+  expect(errors).toEqual([]);
 });
 
 test('RF-20 · al imprimir no hay marco, aunque una cortina esté a 0,5', async ({ page }) => {

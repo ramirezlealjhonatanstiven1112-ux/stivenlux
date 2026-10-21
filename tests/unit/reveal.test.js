@@ -139,30 +139,35 @@ test('groupLines: de la 6.ª línea en adelante se funden en el mismo grupo', ()
   assert.deepEqual(groupLines([0, 50, 100], 2), [[0], [1, 2]]);
 });
 
-test('revealTiming: escritorio, de 1 a 10 líneas, escalonado 80–120 ms y total ≤ 900 ms', () => {
+/* RF-14 cuenta 900 ms desde que se cumple la condición; el revelado arranca unos fotogramas después del
+   scroll (8–64 ms medidos, más con la máquina cargada). Total planificado ≤ 780 ms: 120 ms para el arranque. */
+const DESKTOP_TOTAL = 780;
+
+test('revealTiming: escritorio, de 1 a 10 líneas, escalonado 80–120 ms y total ≤ 780 ms (120 ms para el arranque)', () => {
   for (let lines = 1; lines <= 10; lines += 1) {
     const { duration, stagger } = revealTiming(lines, false);
     const masks = Math.min(lines, 6);
     const total = duration + (masks - 1) * stagger;
     assert.ok(stagger >= 80 && stagger <= 120, `${lines} líneas: escalonado ${stagger}`);
     assert.ok(duration > 0, `${lines} líneas: duración ${duration}`);
-    assert.ok(total <= 900, `${lines} líneas: total ${total}`);
+    assert.ok(total <= DESKTOP_TOTAL, `${lines} líneas: total ${total}`);
   }
 });
 
-test('revealTiming: valores del plan (700 ms con una línea, 880 ms con 3 o más)', () => {
-  assert.deepEqual(revealTiming(1, false), { duration: 700, stagger: 90 });
-  assert.deepEqual(revealTiming(2, false), { duration: 700, stagger: 90 });
-  assert.deepEqual(revealTiming(4, false), { duration: 610, stagger: 90 });
-  assert.deepEqual(revealTiming(6, false), { duration: 430, stagger: 90 });
+test('revealTiming: valores del plan (700 ms por línea como máximo, 80 ms de escalonado, 780 ms con 2 o más)', () => {
+  assert.deepEqual(revealTiming(1, false), { duration: 700, stagger: 80 });
+  assert.deepEqual(revealTiming(2, false), { duration: 700, stagger: 80 });
+  assert.deepEqual(revealTiming(3, false), { duration: 620, stagger: 80 });
+  assert.deepEqual(revealTiming(4, false), { duration: 540, stagger: 80 });
+  assert.deepEqual(revealTiming(6, false), { duration: 380, stagger: 80 });
   assert.deepEqual(revealTiming(10, false), revealTiming(6, false));
   assert.deepEqual(revealTiming(0, false), revealTiming(1, false));
 });
 
-test('revealTiming: móvil, un bloque sin escalonado en ≤ 600 ms con cualquier nº de líneas', () => {
+test('revealTiming: móvil, un bloque sin escalonado en ≤ 480 ms con cualquier nº de líneas (120 ms para el arranque)', () => {
   for (let lines = 1; lines <= 10; lines += 1) {
     const { duration, stagger } = revealTiming(lines, true);
     assert.equal(stagger, 0);
-    assert.ok(duration > 0 && duration <= 600, `${lines} líneas: duración ${duration}`);
+    assert.ok(duration > 0 && duration <= 480, `${lines} líneas: duración ${duration}`);
   }
 });

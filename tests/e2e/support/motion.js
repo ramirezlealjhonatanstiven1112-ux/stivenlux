@@ -30,12 +30,26 @@ export async function loadSettled(page) {
   });
 }
 
+/* Espera a que terminen las animaciones y transiciones en curso (de todo el documento o de los elementos
+   que casan con selector y sus descendientes). Una transición cancelada (p. ej. el tono de la barra al
+   encadenar scrolls) rechaza su promesa con AbortError: se ignora y se vuelve a mirar, por si la ha
+   sustituido otra. Nada es infinito en la página; el tope de 5 s evita colgar el test si lo fuera. */
+export async function animationsDone(page, selector = null) {
+  await page.evaluate(async (sel) => {
+    const t0 = window.performance.now();
+    const running = () =>
+      (sel ? [...document.querySelectorAll(sel)].flatMap((el) => el.getAnimations({ subtree: true })) : document.getAnimations()).filter(
+        (a) => a.playState === 'running' || a.pending,
+      );
+    for (let list = running(); list.length && window.performance.now() - t0 < 5000; list = running()) {
+      await Promise.all(list.map((a) => a.finished.catch(() => {})));
+    }
+  }, selector);
+}
+
 /* Espera a que terminen las animaciones de entrada del hero (composición de reposo). */
 export async function heroEntranceDone(page) {
-  await page.evaluate(async () => {
-    const animations = document.getAnimations().filter((a) => a.effect?.target?.closest?.('.hero'));
-    await Promise.all(animations.map((a) => a.finished));
-  });
+  await animationsDone(page, '.hero');
 }
 
 /* Desplaza al instante (html tiene scroll-behavior: smooth) y deja pasar dos fotogramas. */
@@ -159,4 +173,48 @@ export async function scrollSettled(page) {
       return stable;
     })
     .toBe(true);
+}
+
+/* Captura una franja de la ventana a la resolución del dispositivo y la analiza dentro de la propia página
+   (canvas, sin dependencias). from y to son px CSS de la ventana; se miran todas las filas de dispositivo
+   entre ambos, a todo el ancho. Con ref (0–255): la mayor desviación de cualquier canal respecto a ese
+   tono. Sin ref: el mayor salto de un canal entre dos filas de dispositivo consecutivas. Devuelve también
+   dónde está el peor píxel (px CSS) y cuántas filas se han mirado. Se deja fuera la columna de 6 px de la
+   derecha: en emulación móvil la barra de desplazamiento superpuesta aparece al desplazar y se desvanece
+   después; no es parte de la página. to se limita al borde inferior de la ventana. */
+export async function pixelBand(page, { from, to, ref = null }) {
+  const { dpr, width, vh } = await page.evaluate(() => ({ dpr: window.devicePixelRatio, width: window.innerWidth, vh: window.innerHeight }));
+  to = Math.min(to, vh - 1);
+  const y = Math.max(0, Math.floor(from) - 2);
+  const clip = { x: 0, y, width, height: Math.min(vh, Math.ceil(to) + 2) - y };
+  const png = (await page.screenshot({ clip })).toString('base64');
+  return page.evaluate(
+    async ({ png, dpr, y, from, to, ref }) => {
+      const blob = await (await window.fetch(`data:image/png;base64,${png}`)).blob();
+      const bitmap = await window.createImageBitmap(blob);
+      const canvas = new window.OffscreenCanvas(bitmap.width, bitmap.height);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0);
+      const { data, width } = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+      const columns = width - Math.ceil(6 * dpr);
+      const first = Math.ceil((from - y) * dpr);
+      const last = Math.min(bitmap.height - 1, Math.floor((to - y) * dpr));
+      let worst = 0;
+      let at = null;
+      for (let row = first; row <= last; row += 1) {
+        for (let x = 0; x < columns; x += 1) {
+          const i = (row * width + x) * 4;
+          for (let ch = 0; ch < 3; ch += 1) {
+            const d = ref === null ? (row > first ? Math.abs(data[i + ch] - data[i + ch - width * 4]) : 0) : Math.abs(data[i + ch] - ref);
+            if (d > worst) {
+              worst = d;
+              at = { x: Math.round(x / dpr), y: Math.round((y + row / dpr) * 10) / 10, value: data[i + ch] };
+            }
+          }
+        }
+      }
+      return { worst, at, rows: last - first + 1 };
+    },
+    { png, dpr, y, from, to, ref },
+  );
 }

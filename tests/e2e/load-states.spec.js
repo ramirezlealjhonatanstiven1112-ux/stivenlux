@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { open, scrollToY, heroLayers, curtainRangeOf, scrollToCurtain, waitCurtainApplied, scrollSettled, frame, loadSettled } from './support/motion.js';
+import { open, animationsDone, scrollToY, heroLayers, curtainRangeOf, scrollToCurtain, waitCurtainApplied, scrollSettled, frame, loadSettled } from './support/motion.js';
 
 // Estados finales y de carga de la spec 001: movimiento reducido, sin JavaScript, script bloqueado o tardío,
 // impresión, recarga a mitad de página y URL con ancla. Cada test indica el RF de
@@ -75,8 +75,7 @@ async function expectFinalWhileScrolling(page, { animations = false } = {}) {
 }
 
 /* Espera a que terminen las animaciones de la entrada del hero. */
-const heroDone = (page) =>
-  page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+const heroDone = (page) => animationsDone(page);
 
 test.describe('RF-18 · movimiento reducido', () => {
   test.use({ contextOptions: { reducedMotion: 'reduce' } });
@@ -252,7 +251,7 @@ test('RF-20 · al imprimir tras inclinar el hero con el ratón, la escena sale s
   await page.mouse.move(720, 450);
   await page.mouse.move(150, 150, { steps: 5 });
   await expect.poll(async () => (await transform()) !== neutral && (await transform()) !== 'none', 'inclinada').toBe(true);
-  await page.evaluate(() => Promise.all(document.querySelector('[data-hero-stage]').getAnimations().map((a) => a.finished)));
+  await animationsDone(page, '[data-hero-stage]');
   const tilted = await page.evaluate(() => {
     const m = new window.DOMMatrix(window.getComputedStyle(document.querySelector('[data-hero-stage]')).transform);
     return Math.max(Math.abs(m.m13), Math.abs(m.m23), Math.abs(m.m31), Math.abs(m.m32));
