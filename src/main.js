@@ -7,6 +7,7 @@ import './styles/nav.css';
 import './styles/devices.css';
 import './styles/hero.css';
 import './styles/sections.css';
+import './styles/motion.css';
 
 import { initMenu } from './js/menu.js';
 import { initNavTone } from './js/nav-tone.js';
@@ -22,15 +23,17 @@ initNavTone();
 initWhatsapp();
 splitWords();
 
-// La secuencia del hero arranca cuando las fuentes están listas (o en 1,2 s como máximo)
-Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1200))]).then(() => {
+// La secuencia del hero arranca cuando las fuentes están listas (o en 1,2 s como máximo); el revelado de
+// titulares espera a esa misma promesa
+const fontsReady = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1200))]);
+fontsReady.then(() => {
   root.classList.add('is-ready');
 });
 
 document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 
 if (!reducedMotion) {
-  initScrollFx();
+  initScrollFx(fontsReady);
   initHeroTilt();
   initHeroVideo();
 }

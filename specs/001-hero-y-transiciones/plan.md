@@ -3,6 +3,11 @@
 Spec: `specs/001-hero-y-transiciones/spec.md` (aprobada). Skills: `sdd`, `motion-rules` (con la ampliación
 autorizada), `mockup-screens`.
 
+> **Cambio de requisitos durante T9** (decisión del usuario): lo «visto» se decide al **asentarse la carga**,
+> no al ejecutarse el script, y la impresión cubre tres casos más (RF-20). Afecta a `src/lib/reveal.js`,
+> `scroll-fx.js`, `src/js/reveal.js`, `motion.css` y `load-states.spec.js`. Detalle en «Asentamiento de la
+> carga», en el esquema de `motion.css` y en las decisiones 9 y 10. T1–T8 no cambian.
+
 ## Base de peso (antes de la primera tarea)
 Build del commit `5f01f29`, gzip por archivo y sumado por extensión, igual que `npm run budget`
 (medido por el coordinador): **JS 2.236 B · CSS 10.080 B**. Margen de esta spec: **+2.560 B de JS y
@@ -21,8 +26,9 @@ Build del commit `5f01f29`, gzip por archivo y sumado por extensión, igual que 
    `(1 − c) × max(0, padding propio − 8 px)`, con el padding expuesto como variables (`--pt`, `--pb`, `--px`).
 4. **Palabras y primer escenario**: `--w` en el texto de filosofía (progreso de palabras que espera a la
    cortina) y `--e = 0` en el primer escenario mientras la cortina de Proyectos no llegue a 1.
-5. **Titulares**: `data-reveal` en los 5 `h2`. Al ejecutarse el script, los no vistos reciben `is-pending`
-   (ocultos con `clip-path`, siguen en el árbol de accesibilidad y en la búsqueda). Al cumplir la condición,
+5. **Titulares**: `data-reveal` en los 5 `h2`. Al asentarse la carga (no antes), los que están por debajo
+   de la ventana reciben `is-pending` (ocultos con `clip-path`, siguen en el árbol de accesibilidad y en la
+   búsqueda). Al cumplir la condición,
    `src/js/reveal.js` parte el texto en palabras, mide sus posiciones, agrupa líneas con una función pura,
    envuelve cada línea en una máscara, anima con el `@keyframes hero-line` existente y, al terminar,
    restaura el HTML original para que el titular vuelva a fluir como texto normal.
@@ -33,16 +39,16 @@ Build del commit `5f01f29`, gzip por archivo y sumado por extensión, igual que 
 |---|---|---|---|
 | `src/lib/progress.js` | modificar | Añadir `rangeProgress(value, start, end)` | RF-4, RF-7, RF-11, RF-12 |
 | `src/lib/curtain.js` | crear | Tramo de cortina, progreso de palabras y compuerta del escenario | RF-7, RF-11, RF-12, RF-13 |
-| `src/lib/reveal.js` | crear | «Visto al ejecutarse», condición de revelado, agrupación de líneas, tiempos | RF-14, RF-15, RF-16, RF-19 |
+| `src/lib/reveal.js` | crear (T3) · modificar (T9) | Asentamiento (`settleCheck`, `SETTLE`), «visto al asentarse», condición de revelado, agrupación de líneas, tiempos | RF-12, RF-14, RF-15, RF-16, RF-19 |
 | `src/lib/budget.js` | crear | Decisión del presupuesto (total y margen sobre la base) | RNF peso |
-| `src/js/scroll-fx.js` | modificar | Un único rAF: lecturas primero, escrituras después; `--hero-p`, `is-leaving`, `--c`, `--w`, compuerta de `--e`, llamada al revelado | RF-1–RF-13, RF-19 |
-| `src/js/reveal.js` | crear | DOM del revelado: marcar pendientes, partir en palabras, medir, montar máscaras, restaurar | RF-14–RF-17 |
+| `src/js/scroll-fx.js` | modificar | Un único rAF: lecturas primero, escrituras después; `--hero-p`, `is-leaving`, `--c`, `--w`, compuerta de `--e`, detección del asentamiento (T9), llamada al revelado | RF-1–RF-13, RF-19 |
+| `src/js/reveal.js` | crear (T8) · modificar (T9) | DOM del revelado: decidir pendientes al asentarse, partir en palabras, medir, montar máscaras, restaurar | RF-14–RF-17, RF-19 |
 | `src/js/hero.js` | modificar | La inclinación ignora el puntero con `.hero.is-leaving` | RF-6 |
 | `src/main.js` | modificar | Importar `motion.css`; pasar a `initScrollFx` la promesa de fuentes listas | RF-14, RF-19 |
 | `src/styles/hero.css` | modificar | Transform de capas con amplitudes por perfil; `is-leaving`; `is-video` sin separación | RF-1–RF-3, RF-5, RF-6 |
 | `src/styles/base.css` | modificar | Padding de secciones como `--pt --px --pb` (mismo valor que hoy) | RF-7 |
 | `src/styles/sections.css` | modificar | `.work { --px: 0px }`, `.contact { --pb: … }`; fórmula de palabras con `--w` | RF-7, RF-12 |
-| `src/styles/motion.css` | crear | `@property` de los grosores, marco de cortina, titulares pendientes y máscaras, impresión | RF-7–RF-9, RF-14–RF-17, RF-20, RF-21 |
+| `src/styles/motion.css` | crear (T6) · modificar (T9) | `@property` de los grosores, marco de cortina, titulares pendientes y máscaras, impresión (también escenario, inclinación y revelado en curso) | RF-7–RF-9, RF-14–RF-17, RF-20, RF-21 |
 | `src/partials/sections/{philosophy,work,services,process,contact}.html` | modificar | `data-curtain` en la `section`, `data-reveal` en el `h2` | RF-7, RF-14 |
 | `scripts/check-budget.mjs` | modificar | Base y margen de la spec 001; imprime y comprueba el incremento en bytes | RNF peso |
 | `.claude/skills/motion-rules/SKILL.md` | modificar (autorizado) | Progreso por sección de las cortinas (`--c`) y su derivado `--w` | — |
@@ -92,7 +98,22 @@ gated(value, curtain):                                    // primer escenario (R
 
 ### `reveal.js`
 ```
-seenAtStart(top, viewportHeight): devolver top < viewportHeight   // ≥ 1 px dentro o por encima
+SETTLE = { quiet: 400, max: 1000 }                        // ms (spec: «intervalo corto» y «como muy tarde 1 s»)
+// quiet = 400 y no 200 (T9): el salto suave de restauración/ancla deja huecos de hasta 199 ms entre fotogramas
+
+// T9: renombra seenAtStart (misma fórmula); el momento lo decide settleCheck
+seenOnSettle(top, viewportHeight): devolver top < viewportHeight  // ≥ 1 px dentro o por encima
+
+// ¿Se ha asentado la carga? Tiempos en ms de performance.now():
+// start = ejecución del script · loadedAt = fin de la carga (null si aún no) · lastMove = último fotograma
+// en que scrollY cambió (start si no ha cambiado)
+settleCheck({ now, start, loadedAt, lastMove, quiet = SETTLE.quiet, max = SETTLE.max }):
+  untilMax = max - (now - start)
+  si untilMax <= 0: devolver { due: true, wait: 0 }                 // tope de 1 s, aunque siga moviéndose
+  si loadedAt es null: devolver { due: false, wait: untilMax }      // la carga no ha terminado
+  calm = now - max(loadedAt, lastMove)                              // calma desde la carga o el último movimiento
+  si calm >= quiet: devolver { due: true, wait: 0 }
+  devolver { due: false, wait: min(quiet - calm, untilMax) }        // cuándo volver a mirar si nada se mueve
 
 shouldReveal({ top, bottom, viewportHeight, curtain, atEnd, ready }):
   dentro = bottom > 0 y top < viewportHeight
@@ -129,49 +150,94 @@ cambió (se guarda el último valor por elemento).
 
 ```
 init(ready):                                   // se ejecuta una vez, al ejecutarse el script principal
-  vh = innerHeight
   curtains = [ { el, c: null } por cada [data-curtain] ]
-  philosophy = curtain de #filosofia; philosophySeen = seenAtStart(top de #filosofia, vh)
+  philosophy = curtain de #filosofia; philosophySeen = null     // T9: se decide al asentarse
   firstStage = primer .project__stage
-  reveal = createReveal(vh)                    // marca is-pending en los titulares no vistos
+  reveal = createReveal()                      // T9: no marca nada todavía
+  scriptAt = performance.now(); lastMove = scriptAt; lastY = scrollY; settled = false; settleTimer = 0
+  loadedAt = document.readyState === 'complete' ? scriptAt : null  // script tardío: la carga ya terminó
+  si loadedAt es null: addEventListener('load', () => { loadedAt = performance.now(); request() }, { once: true })
   ready.then(() => { isReady = true; request() })
   observar [data-scroll] como hoy; listeners de scroll y resize como hoy; request()
 
 update():
   // ── lecturas ──
   vh = innerHeight; y = scrollY; maxScroll = scrollHeight - vh
+  toMark = []
+  si no settled:                               // T9: asentamiento con el mismo rAF del scroll
+    now = performance.now()
+    si y != lastY: lastMove = now; lastY = y   // el listener de scroll ya pide este fotograma
+    { due, wait } = settleCheck({ now, start: scriptAt, loadedAt, lastMove })
+    si due:
+      settled = true; clearTimeout(settleTimer)
+      philosophySeen = seenOnSettle(top de #filosofia, vh)
+      toMark = reveal.settle(vh)               // titulares por debajo de la ventana (solo lectura)
+    si no:
+      clearTimeout(settleTimer); settleTimer = setTimeout(request, wait)   // por si nada más pide fotograma
   mobile = !matchMedia('(min-width: 48em)').matches; rise = mobile ? 0.4 : 0.6
   heroP = heroProgress(y, vh)
   para cada curtain: top = rect.top + y; { start, end } = curtainRange(top, vh, maxScroll, rise)
                      curtain.c = rangeProgress(y, start, end); curtain.end = end
   rects de los [data-scroll] visibles (como hoy)
   st = rect del texto de filosofía
-  w = philosophySeen ? legacyWordsProgress(traverseProgress(st.top, st.height, vh))
-                     : wordsProgress(y, philosophy.end, wordsEnd(st.top + y, st.height, vh))
+  w = (no settled o philosophySeen) ? legacyWordsProgress(traverseProgress(st.top, st.height, vh))   // spec 000
+                                    : wordsProgress(y, philosophy.end, wordsEnd(st.top + y, st.height, vh))
   // ── escrituras ──
   escribir --hero-p si cambió (sin el tope actual de 1,5 pantallas: RF-4)
   leaving = heroP > 0; si cambió: toggle .hero.is-leaving y, al entrar, quitar --mx/--my del escenario
   escribir --c de cada sección si cambió
   escribir --p y --e de los visibles; en el primer escenario, --e = gated(e, work.c)
   escribir --w en el texto de filosofía si cambió
-  reveal.check({ vh, mobile, atEnd: y >= maxScroll - 1, ready: isReady, curtainOf(section) })
+  para cada t en toMark: t.classList.add('is-pending')          // T9: siempre fuera de la ventana
+  revelar los titulares de reveal.due({ vh, atEnd: y >= maxScroll - 1, ready: isReady, curtainOf })
 ```
-`reveal.check` solo lee rects de los titulares pendientes (≤ 5) y, si toca, revela; el revelado hace su
-propia medición de palabras en ese mismo fotograma, una sola vez por titular.
+`reveal.due` va en las lecturas (solo lee rects de los titulares pendientes, ≤ 5; antes del asentamiento no
+hay ninguno) y `revealTitle` en las escrituras; el revelado hace su propia medición de palabras en ese mismo
+fotograma, una sola vez por titular.
+
+## Asentamiento de la carga (T9, RF-12, RF-16, RF-19)
+- **Cuándo se decide**: en el primer fotograma en que `settleCheck` da `due`: 400 ms sin cambios de
+  `scrollY` desde el fin de la carga (o desde la ejecución del script, si la carga ya había terminado), o
+  1.000 ms desde la ejecución del script, lo que llegue antes. Medido en T9: Chromium ejecuta el módulo a
+  ~113–146 ms y restaura o salta al ancla entre ~170 y ~900 ms, con `scroll-behavior: smooth`; el
+  desplazamiento suave emite `scroll` en cada fotograma, así que la calma no se cumple mientras dura.
+- **Cómo se detecta sin listeners de scroll nuevos**: el listener de scroll existente ya pide el rAF; en las
+  lecturas de `update()` se compara `scrollY` con el del fotograma anterior y se guarda `lastMove`. Solo se
+  añaden un listener de `load` de una vez y un único `setTimeout` (reprogramado con `wait`) que pide un
+  fotograma cuando no lo pide nadie. Ambos desaparecen tras decidir. Se cumple motion-rules («no añadas otro
+  listener de scroll»).
+- **Antes de decidir**: ningún titular tiene `is-pending` (todos visibles, como sin script), `reveal.due` no
+  devuelve nada y las palabras usan `legacyWordsProgress` (regla de la spec 000). Cortinas, `--hero-p`,
+  `is-leaving` y la compuerta del primer escenario funcionan desde el primer fotograma (RF-7, RF-13).
+- **Al decidir** (un solo fotograma): lecturas de las 5 cajas de titular y de Filosofía; escrituras de
+  `is-pending` solo en los que tienen `top >= vh`, es decir, fuera de la ventana: no hay cambio visible. Las
+  palabras pasan a `wordsProgress` solo si Filosofía queda pendiente; en ese caso el texto está por debajo de
+  la ventana y ambas reglas dan opacidad mínima, así que tampoco hay salto.
+- **Script después de la red de seguridad** (2,5 s): `document.readyState` ya es `complete`, así que
+  `loadedAt = scriptAt` y la decisión llega a los 400 ms de calma (como mucho 1 s). Hasta entonces todo sigue
+  como sin script; la red de seguridad del hero no cambia.
+- **`createReveal()`** pasa a no marcar nada al crearse y expone `settle(vh)`: lee la caja de cada
+  `[data-reveal]`, guarda como pendientes los que no cumplen `seenOnSettle` y los devuelve para que
+  `scroll-fx.js` les ponga `is-pending` en las escrituras.
+- **Si en los tests la restauración empezara más de 200 ms después de `load`**: se sube `SETTLE.quiet`
+  (hasta 400 ms, sin pasar del tope de 1 s); si ni así pasa, el implementer para e informa.
 
 ## Revelado de titulares (`src/js/reveal.js`)
 ```
-createReveal(vh):
+createReveal():                                // T9: no marca nada al crearse
+  titles = [ { title: h, section: h.closest('[data-curtain]') } por cada h2[data-reveal] ]
   pending = []
-  para cada h2[data-reveal]:
-    si no seenAtStart(h.getBoundingClientRect().top, vh): h.classList.add('is-pending'); pending.push(h)
-  devolver { check }
+  devolver { settle, due }
 
-check({ vh, mobile, atEnd, ready, curtainOf }):
+settle(vh):                                    // lecturas; una vez, al asentarse la carga
+  pending = titles.filter(t => no seenOnSettle(t.title.getBoundingClientRect().top, vh))
+  devolver pending.map(t => t.title)           // scroll-fx.js les pone is-pending en las escrituras
+
+due({ vh, atEnd, ready, curtainOf }):          // lecturas; [] mientras no se haya asentado
   para cada h en pending:
     r = rect de h
     si shouldReveal({ top: r.top, bottom: r.bottom, viewportHeight: vh, curtain: curtainOf(h), atEnd, ready }):
-      quitar h de pending; revealTitle(h, mobile)
+      quitar h de pending; devolverlo          // scroll-fx.js llama a revealTitle(h, mobile) en las escrituras
 
 revealTitle(h, mobile):
   original = h.innerHTML
@@ -264,10 +330,22 @@ revealTitle(h, mobile):
 @media print {                       /* mismos selectores (o más específicos) que las reglas que anulan */
   .js [data-curtain]::before { content: none }  .js [data-reveal].is-pending { clip-path: none }
   .hero__layer { transform: none }  .philosophy__statement .w { opacity: 1 }
+  /* T9 (RF-20) */
+  .project__stage { clip-path: none }                     /* primer escenario completo aunque --e = 0 (inline) */
+  .hero .hero__stage { transform: none; transition: none } /* sin inclinación; sin transición al cambiar de medio */
+  .js .is-revealing .ln > span { animation: none }        /* titular a medio revelar: líneas en su sitio */
 }
 ```
 `motion.css` se importa después de `hero.css` y `sections.css`, así que a igual especificidad gana la regla
-de impresión.
+de impresión. Notas de T9:
+- El escenario recibe `--e` como estilo en línea, que el CSS no puede anular sin `!important`; por eso se
+  anula el `clip-path` que lo usa, no la variable. Se aplica a todos los escenarios (un escenario a medio
+  abrir tampoco debe salir recortado); las capas internas conservan su posición, sin recorte.
+- `.hero .hero__stage` (0,2,0) gana a `.hero__stage` y a sus variantes de móvil; `.hero.is-leaving
+  .hero__stage` solo cambia `transition-duration`, que `transition: none` anula igualmente. Sin
+  `transition: none`, al pasar a impresión la escena tardaría 1,2 s en llegar a `none`.
+- `animation: none` quita la animación de la máscara: `.ln > span` queda sin transformar y con opacidad 1
+  (`hero-line` solo anima `transform`). El `setTimeout` que restaura el HTML sigue funcionando igual.
 - Con `--c` sin escribir (sin JS, script fallido o antes de ejecutarse) el marco tiene grosor 0: la sección
   se ve con su fondo completo (RF-19, RF-20). Con movimiento reducido no existe el `::before` (RF-18).
 - El marco está detrás del contenido (`z-index: -1` en un contexto aislado) y dentro del padding menos 8 px:
@@ -321,13 +399,26 @@ de impresión.
    `MutationObserver` sobre `is-ready`. Motivo: una sola fuente de verdad y ningún observador extra.
 8. **Tests de esta spec en archivos e2e nuevos** en vez de ampliar `landing.spec.js`. Motivo: los tests de
    la spec 000 quedan intactos (RF-22) y cada archivo agrupa un bloque de RF.
+9. **Decidir lo visto al asentarse la carga, detectado en el rAF existente** (T9) en vez de:
+   - **`history.scrollRestoration = 'manual'`** y restaurar nosotros la posición antes de decidir.
+     Descartada: sustituye un comportamiento nativo del navegador (contra «sin scroll secuestrado»), obliga a
+     guardar la posición (p. ej. en `sessionStorage`), no resuelve el salto al ancla (habría que reimplementarlo
+     con `scroll-padding-top` y el desplazamiento suave) ni el script tardío, y cuesta más JS.
+   - **Aceptar la animación** en recarga y ancla. Descartada: contradice RF-16 y RF-19 y la decisión del
+     usuario (un titular que el visitante ya está leyendo desaparecería y volvería a subir).
+   - **Escuchar `scrollend`** o un `IntersectionObserver` por titular para saber cuándo para el scroll.
+     Descartada: `scrollend` sería un listener de scroll nuevo (motion-rules lo prohíbe) y no está en todos
+     los navegadores objetivo; el observador no sabe cuándo ha terminado la restauración.
+10. **Impresión con tres reglas de CSS** (escenario sin `clip-path`, escena sin `transform` ni transición,
+    máscaras sin animación) en vez de escuchar `beforeprint` y deshacer estados desde JS. Motivo: 0 B de JS,
+    funciona también con «Guardar como PDF» y vista previa sin depender de eventos, y es el mismo patrón que
+    ya usa `@media print` en `motion.css`.
 
-## Riesgo a vigilar (sin cambiar la spec)
-- **Restauración del scroll al recargar y anclas**: la spec trata «recarga a mitad de página» y «URL con
-  ancla» como vistos al ejecutarse el script (RF-16). Si el navegador restaurara la posición *después* de
-  ejecutar el módulo, esos titulares quedarían pendientes y se revelarían con animación. T9 lo comprueba con
-  un test; si falla, el implementer para y el coordinador consulta al usuario (no se cambia la definición sin
-  aprobación).
+## Riesgo resuelto (T9)
+- **Restauración del scroll al recargar y anclas**: confirmado en T9 (el módulo ve y = 0; la posición llega
+  después y de forma suave). Resuelto con el cambio de requisitos aprobado por el usuario: «Asentamiento de la
+  carga» (decisión 9). Riesgo residual aceptado en la spec: una restauración de más de 1 s decide con la
+  posición del tope y lo que llegue después se revela con animación.
 
 ## Impacto en el peso (estimado, gzip)
 | Pieza | JS | CSS |
@@ -344,6 +435,15 @@ de impresión.
 
 `budget.js` no entra en el bundle (solo lo importa el script de presupuesto).
 
+**Cambio de T9** (sobre lo medido tras T8: +1.386 B de JS y +487 B de CSS):
+| Pieza | JS | CSS |
+|---|---|---|
+| `settleCheck` + `SETTLE` | ≈ 90 B | — |
+| Asentamiento en `scroll-fx.js` (`lastMove`, `load`, temporizador, `toMark`) | ≈ 130 B | — |
+| `createReveal().settle` (sustituye al marcado inicial) | ≈ 20 B | — |
+| Tres reglas de impresión | — | ≈ 70 B |
+| **Total tras T9 (estimado)** | **≈ +1.630 B de +2.560 B** | **≈ +560 B de +3.072 B** |
+
 **Verificación**: `scripts/check-budget.mjs` incorpora `BASE = { js: 2236, css: 10080 }` y
 `ALLOWANCE = { js: 2560, css: 3072 }` (comentados como «spec 001, build de 5f01f29») y, con `budgetCheck()`,
 imprime por extensión el total, el límite general y el incremento en bytes con su máximo, y sale con error si
@@ -359,7 +459,8 @@ Cuando se implemente la spec 002, su plan fijará la nueva base.
 | `progress.test.js`: `rangeProgress` (tramo normal, vacío, invertido, límites) | RF-4, RF-7 |
 | `curtain.test.js`: `curtainRange` con 0,6/0,4, tramo acortado (end = maxScroll), progreso 1 en maxScroll, sección visible con scroll 0 | RF-7, RF-11 |
 | `curtain.test.js`: `wordsProgress` = 0 antes de la cortina, 1 en el centro, caso textEnd ≤ curtainEnd; `legacyWordsProgress` igual a la curva de la spec 000; `gated` | RF-12, RF-13 |
-| `reveal.test.js`: `seenAtStart` (1 px dentro, por encima, justo en el borde) | RF-16, RF-19 |
+| `reveal.test.js`: `seenOnSettle` (1 px dentro, por encima, justo en el borde) | RF-16, RF-19 |
+| `reveal.test.js` (T9): `settleCheck` — sin carga solo decide el tope (999 → no, 1000 → sí, `wait` = lo que falta); con carga, 200 ms de calma desde `loadedAt` o desde `lastMove` (lo posterior); un movimiento reinicia la calma; tope de 1 s aunque haya movimiento; `wait` ≤ lo que falta al tope; carga anterior al script (`loadedAt` = `start`) | RF-12, RF-16, RF-19 |
 | `reveal.test.js`: `shouldReveal` (85 %, cortina < 1, fuera de la ventana, `atEnd`, `ready`) | RF-11, RF-12, RF-13, RF-14 |
 | `reveal.test.js`: `groupLines` (una línea, varias, `<br>` simulado, tolerancia, fusión desde la 6.ª) | RF-14 |
 | `reveal.test.js`: `revealTiming` (escalonado 80–120, total ≤ 900 de 1 a 10 líneas; móvil sin escalonado ≤ 600) | RF-14, RF-15 |
@@ -399,9 +500,13 @@ Ayudas en `tests/e2e/support/motion.js`: `open(page)` (como el de la spec 000, r
 | `load-states` · movimiento reducido: capas en reposo con scroll, sin `::before`, titulares y palabras finales, 0 animaciones | 1440×900, móvil | RF-18 |
 | `load-states` · sin JavaScript (`javaScriptEnabled: false`): todo final; CTA con `href` de la spec 000 | 1440×900, móvil | RF-20 |
 | `load-states` · módulo bloqueado (`route.abort`): pasados 2,5 s, hero visible y todo final | 1440×900 | RF-19, RF-20 |
-| `load-states` · módulo retrasado 3 s con la página en Servicios: titulares vistos sin animación; cortinas según posición | 1440×900 | RF-19 |
-| `load-states` · recarga a mitad de página y `/#servicios`: titulares vistos sin animación ni `is-pending` | 1440×900, móvil | RF-16, RF-19 |
+| `load-states` · módulo retrasado 3 s con la página en Servicios: cortinas y `--hero-p` según posición desde el primer fotograma; titulares vistos nunca pendientes ni animados (registro desde antes del script); los de debajo, pendientes tras el asentamiento (`expect.poll`, ≤ 1.100 ms desde que se escribe `--hero-p`) | 1440×900 | RF-19 |
+| `load-states` · recarga a mitad de página (Servicios a la vista con su cortina en 1): `MutationObserver` desde `addInitScript`; ningún titular visto llega a `is-pending`, `is-revealing` ni máscaras; los de debajo quedan pendientes; el primer `is-pending` llega ≤ `domContentLoadedEventStart` + 1.100 ms (el módulo se ejecuta antes de ese evento); cortinas según la posición | 1440×900, móvil | RF-16, RF-19 |
+| `load-states` · `/#servicios`: mismas comprobaciones, con Servicios bajo la barra | 1440×900, móvil | RF-16, RF-19 |
 | `load-states` · impresión (`emulateMedia print`) con una cortina a 0,5 y titulares pendientes: todo final | 1440×900 | RF-20 |
+| `load-states` (T9) · impresión con la cortina de Proyectos a 0,9: el primer escenario tenía `clip-path` de recorte y en impresión es `none` | 1440×900 | RF-20, RF-13 |
+| `load-states` (T9) · impresión tras inclinar con el ratón con progreso 0: la escena tenía rotación y en impresión su `transform` es `none` al instante y 200 ms después | 1440×900 | RF-20, RF-6 |
+| `load-states` (T9) · impresión a mitad de un revelado (≈ 150 ms tras arrancar, con `.ln` presentes en la misma lectura): cada `.ln > span` sin transformar, opacidad 1 y sin animaciones en curso en el titular | 1440×900 | RF-20, RF-14 |
 | `spec001-rnf` · CLS = 0 en un recorrido completo arriba-abajo; CLS de carga ≤ el de la base | 1440×900, móvil | RNF estabilidad |
 | `spec001-rnf` · sin `longtask` > 50 ms durante el recorrido | escritorio | RNF estabilidad |
 | `spec001-rnf` · axe sin infracciones con movimiento permitido, una cortina a 0,5, menú cerrado y abierto | 1440×900, móvil | RF-22 |
@@ -421,6 +526,6 @@ scratchpad, sin tocar el repositorio) y se anota como constante comentada en el 
 | RF-12, RF-13 | `wordsProgress`/`legacyWordsProgress`/`gated` + `--w` y `--e` en `scroll-fx.js` + `shouldReveal` |
 | RF-14–RF-17 | `reveal.js` (lib y DOM) + máscaras en `motion.css` |
 | RF-18 | Todo bajo `no-preference`; `initScrollFx` no se llama con movimiento reducido (como hoy) |
-| RF-19, RF-20 | Valores por defecto de reposo, `is-pending` solo tras ejecutarse el script, `@media print` |
+| RF-19, RF-20 | Valores por defecto de reposo, `is-pending` solo al asentarse la carga (`settleCheck` + `createReveal().settle`), `@media print` con escenario, escena y máscaras |
 | RF-21 | Marco detrás del contenido y dentro de padding − 8 px; escena bajo el texto |
 | RF-22 | Tests de la spec 000 intactos + axe con movimiento + `npm run check` |

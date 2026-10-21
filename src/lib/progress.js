@@ -15,3 +15,9 @@ export function enterProgress(top, viewportHeight) {
 export function heroProgress(scrollY, viewportHeight) {
   return clamp01(scrollY / viewportHeight);
 }
+
+/* Progreso lineal de value entre start (0) y end (1). Tramo vacío o invertido: 1 desde end, 0 antes. */
+export function rangeProgress(value, start, end) {
+  if (end <= start) return value >= end ? 1 : 0;
+  return clamp01((value - start) / (end - start));
+}

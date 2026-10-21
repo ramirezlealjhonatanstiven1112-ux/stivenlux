@@ -63,8 +63,15 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
 - **Líneas de un titular**: los renglones en que el navegador corta el texto del titular en el momento en
   que empieza su revelado, con el ancho de la ventana, el tamaño de texto y las tipografías de ese momento.
   Un salto de línea forzado (hoy, solo en Proyectos) también corta línea.
-- **Visto al ejecutarse el script**: sección o titular que, en el momento en que se ejecuta el script
-  principal, tiene al menos 1 px dentro de la ventana o está por encima de ella.
+- **Asentamiento de la carga**: el momento en que se decide qué está visto. Llega cuando, terminada la carga
+  de la página (o desde que se ejecuta el script principal, si la carga ya había terminado), pasa un
+  intervalo corto sin que la página se desplace, o, como muy tarde, 1 s después de que se ejecute el script
+  principal, lo que ocurra antes. Así se espera a que el navegador termine de restaurar la posición al
+  recargar o de saltar al ancla de la URL, que pueden llegar después de ejecutarse el script y de forma
+  suave. Se decide una sola vez por carga.
+- **Visto al asentarse la carga**: sección o titular que, en el momento del asentamiento de la carga, tiene
+  al menos 1 px dentro de la ventana o está por encima de ella. Lo que está por debajo de la ventana en ese
+  momento es **pendiente**.
 
 ## Requisitos funcionales
 
@@ -109,8 +116,8 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
 ### Cortinas entre secciones
 - RF-7: MIENTRAS el movimiento esté permitido, EL SISTEMA abrirá con una cortina el fondo de la sección
   entrante en cada una de las 5 fronteras de tono, de forma continua y monótona con su progreso de cortina y
-  solo a partir de la posición del scroll (reversible). La cortina sigue el scroll siempre, también en las
-  secciones vistas al ejecutarse el script: al subir por encima de su tramo vuelve a cerrarse y al bajar se
+  solo a partir de la posición del scroll (reversible). La cortina sigue el scroll siempre, desde que se
+  ejecuta el script y sin esperar al asentamiento de la carga, también en las secciones vistas: al subir por encima de su tramo vuelve a cerrarse y al bajar se
   abre de nuevo, tantas veces como se recorra. Con progreso 0, la franja sin descubrir de cada lado
   mide el margen interior propio de esa sección en ese lado menos 8 px (reserva para el indicador de foco),
   nunca menos de 0 (en Proyectos, sin margen lateral, no hay franja lateral); con progreso 0,5, entre el
@@ -130,21 +137,24 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   da recorrido suficiente.
 
 ### Un momento dominante por pantalla
-- RF-12: MIENTRAS la cortina de Filosofía no haya llegado a 1, EL SISTEMA mantendrá su titular sin revelar y
-  todas las palabras del texto de filosofía en su opacidad mínima de hoy. Cambio declarado respecto a la
-  spec 000: la iluminación por palabras (ligada al scroll y reversible, como hoy) empieza cuando la cortina
-  llega a 1 y deja todas las palabras en opacidad completa, como muy tarde, cuando el centro del texto
-  alcanza el centro de la ventana. Si Filosofía fue vista al ejecutarse el script, su titular queda en
-  estado final (RF-16) y sus palabras siguen durante toda la carga la regla ligada al scroll de la spec 000;
-  su cortina sigue el scroll como las demás (RF-7).
+- RF-12: MIENTRAS la carga se haya asentado con Filosofía pendiente (por debajo de la ventana) y su cortina
+  no haya llegado a 1, EL SISTEMA mantendrá su titular sin revelar y todas las palabras del texto de
+  filosofía en su opacidad mínima de hoy. Cambio declarado respecto a la spec 000: en ese caso la
+  iluminación por palabras (ligada al scroll y reversible, como hoy) empieza cuando la cortina llega a 1 y
+  deja todas las palabras en opacidad completa, como muy tarde, cuando el centro del texto alcanza el centro
+  de la ventana. Desde que se ejecuta el script hasta el asentamiento, y durante toda la carga si Filosofía
+  fue vista al asentarse, su titular queda en estado final (RF-16) y sus palabras siguen la regla ligada al
+  scroll de la spec 000; el paso a la regla nueva al asentarse ocurre con el texto por debajo de la ventana,
+  sin cambio visible. Su cortina sigue el scroll como las demás (RF-7).
 - RF-13: MIENTRAS la cortina de Proyectos no haya llegado a 1, EL SISTEMA mantendrá el primer escenario de
-  proyecto en su estado inicial, sin empezar a abrirse, y su titular sin revelar si no fue visto al
-  ejecutarse el script. Como la cortina siempre sigue el scroll (RF-7), la condición sobre el escenario se
-  aplica en cualquier carga. Comprobado a 1440×900, 1366×600, 844×390 y en el proyecto móvil.
+  proyecto en su estado inicial, sin empezar a abrirse, y su titular sin revelar si quedó pendiente al
+  asentarse la carga. Como la cortina siempre sigue el scroll (RF-7), la condición sobre el escenario se
+  aplica en cualquier carga, también antes del asentamiento. Comprobado a 1440×900, 1366×600, 844×390 y en
+  el proyecto móvil.
 
 ### Revelado de titulares de sección
 - RF-14: MIENTRAS el movimiento esté permitido y la ventana sea de escritorio, CUANDO un titular de sección
-  aún no revelado, que no fuera visto al ejecutarse el script, tenga alguna parte dentro de la ventana con su
+  pendiente (por debajo de la ventana al asentarse la carga) y aún no revelado tenga alguna parte dentro de la ventana con su
   borde superior por encima del 85 % del alto de la ventana (medido desde arriba) y la cortina de su sección
   esté en 1, EL SISTEMA lo revelará línea a línea:
   - Cada línea del titular (ver Definiciones) sube desde su propia máscara, de arriba abajo, con un
@@ -160,9 +170,10 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   de RF-14, EL SISTEMA lo revelará entero a la vez, como un único bloque desde una sola máscara aunque ocupe
   varias líneas y sin escalonado, en 600 ms como máximo (con la misma espera a las tipografías de RF-14).
 - RF-16: EL SISTEMA revelará cada titular una sola vez por carga: al subir y volver a bajar sigue visible,
-  aunque su cortina se cierre y se vuelva a abrir. Los titulares vistos al ejecutarse el script (recarga a
-  mitad de página, URL con ancla) se muestran en su estado final desde el principio, sin animación ni
-  parpadeo. Terminado el revelado, el titular vuelve a comportarse como texto normal: si después cambian el
+  aunque su cortina se cierre y se vuelva a abrir. Los titulares vistos al asentarse la carga (recarga a
+  mitad de página, URL con ancla, también cuando el navegador restaura la posición o salta al ancla después
+  de ejecutarse el script, de forma suave) se muestran en su estado final desde el principio: en ningún
+  momento de la carga quedan pendientes ni recortados, no se animan y no parpadean. Terminado el revelado, el titular vuelve a comportarse como texto normal: si después cambian el
   ancho o el tamaño de texto, se recoloca sin restos de las líneas anteriores y sin volver a animarse.
 - RF-17: EL SISTEMA expondrá cada titular a los lectores de pantalla como una sola frase con el mismo texto
   que hoy (sin contar espacios), antes, durante y después del revelado. El revelado no desplazará ningún
@@ -178,15 +189,26 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   (secciones con su fondo completo, titulares visibles y palabras de filosofía en opacidad completa): las
   cortinas y los revelados nunca ocultan nada antes de que el script los gestione. CUANDO el script se
   ejecute, a tiempo o después de la red de seguridad:
-  - Los titulares vistos en ese momento quedan en estado final durante toda la carga, sin animación ni
-    parpadeo; solo los que aún están por debajo de la ventana reciben revelado.
   - Las cortinas de todas las secciones, también las vistas, pasan al estado que corresponde a la posición
     del scroll y desde entonces la siguen (RF-7). Como solo actúan sobre el fondo y nunca recortan
     contenido (RF-9), ningún texto ni elemento pulsable se oculta ni cambia de contraste.
-  - La salida del hero se aplica según la posición del scroll.
+  - La salida del hero se aplica según la posición del scroll y desde entonces la sigue.
+  - Hasta el asentamiento de la carga, ningún titular queda pendiente ni recortado y las palabras de
+    filosofía siguen la regla de la spec 000 (RF-12): no se oculta nada nuevo.
+  - Al asentarse la carga (como muy tarde 1 s después de ejecutarse el script), los titulares vistos quedan
+    en estado final durante toda la carga, sin animación ni parpadeo; solo los que en ese momento están por
+    debajo de la ventana quedan pendientes y reciben revelado. Un titular pasa a pendiente siempre fuera de
+    la ventana, sin cambio visible.
 - RF-20: SI no hay JavaScript o el script principal falla, o CUANDO se imprima la página, ENTONCES EL SISTEMA
-  mostrará todo en su estado final: hero en reposo, secciones con su fondo completo y titulares visibles. Los
-  CTA funcionan como en la spec 000.
+  mostrará todo en su estado final: hero en reposo, secciones con su fondo completo y titulares visibles. Al
+  imprimir, además, con cualquier estado previo de la página:
+  - el primer escenario de Proyectos se ve completo, sin recorte, aunque su cortina no haya llegado a 1
+    (RF-13);
+  - el hero sale sin la inclinación del puntero (escena sin rotación), aunque el puntero la hubiera
+    inclinado;
+  - un titular a medio revelar sale completo: todas sus líneas en su posición final (sin desplazamiento) y
+    con opacidad completa.
+  Los CTA funcionan como en la spec 000.
 - RF-21: CUANDO un elemento reciba el foco con teclado, EL SISTEMA mostrará su indicador de foco completo, sin
   que lo tape ningún dispositivo del hero ni ninguna cortina.
 - RF-22: EL SISTEMA seguirá cumpliendo todos los RF de la spec 000 y sus requisitos no funcionales (en
@@ -222,19 +244,36 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   desplazamiento horizontal. Sin puntero fino no hay inclinación (RF-6).
 - **Móvil en horizontal estrecho** (p. ej. 667×375): ancho menor de 768 px, así que recibe el comportamiento
   de móvil con las amplitudes de alto menor de 500 px (RF-3).
-- **Barras dinámicas reales del navegador móvil**: Filosofía puede asomar unos píxeles al cargar; su
-  titular queda en estado final, sin revelado, y su cortina sigue el scroll; es aceptable (RF-19).
+- **Barras dinámicas reales del navegador móvil**: Filosofía puede asomar unos píxeles al asentarse la
+  carga; su titular queda en estado final, sin revelado, y su cortina sigue el scroll; es aceptable (RF-19).
+  Si las barras cambian el alto de la ventana antes del asentamiento, cuenta el alto del momento del
+  asentamiento.
+- **Recarga a mitad de página**: el navegador restaura la posición después de ejecutarse el script, a veces
+  con desplazamiento suave. Hasta el asentamiento nada queda pendiente; al asentarse, lo que está a la vista
+  o por encima queda final sin animación y lo de abajo, pendiente (RF-16, RF-19). Comprobado en escritorio y
+  en el proyecto móvil.
+- **URL con ancla** (p. ej. `/#servicios`): igual que la recarga; el salto al ancla (suave) termina antes del
+  asentamiento y los titulares de las secciones a la vista o por encima no se animan (RF-16, RF-19).
+- **Visitante que se desplaza durante la carga**: mientras se desplaza, el asentamiento se aplaza, como
+  mucho hasta 1 s después de ejecutarse el script. Los titulares que cruza antes se ven en estado final
+  (RF-19).
+- **Restauración más lenta de 1 s** (dispositivo muy lento): se decide con la posición de ese momento; un
+  titular que llegue a la ventana después recibe su revelado normal (RF-14). Es aceptable.
 - **Scroll rápido, hacia atrás o salto por ancla con desplazamiento suave**: al detenerse, la salida y las
   cortinas tienen el estado de esa posición (RF-4, RF-7). Un titular que se cruce durante el salto puede
   revelarse fuera de la vista; después sigue visible (RF-16).
-- **Carga con la página ya desplazada**: los titulares vistos al ejecutarse el script quedan en estado
-  final; las cortinas toman el estado de la posición, también en las secciones a la vista, sin tocar su
-  contenido (RF-19).
+- **Carga con la página ya desplazada**: los titulares vistos al asentarse la carga quedan en estado
+  final; las cortinas toman el estado de la posición desde que se ejecuta el script, también en las
+  secciones a la vista, sin tocar su contenido (RF-19).
 - **Volver a subir por encima de una sección ya vista**: su cortina se cierra y se vuelve a abrir al bajar;
   su titular sigue revelado (RF-7, RF-16).
-- **Script tardío**: si el script se ejecuta con el progreso de salida mayor que 0, los dispositivos pasan
-  al estado de esa posición en ese momento; ningún titular ni texto ya visto se oculta y las cortinas toman
-  el estado de la posición (RF-19).
+- **Script tardío** (también después de la red de seguridad de 2,5 s): si el script se ejecuta con el
+  progreso de salida mayor que 0, los dispositivos y las cortinas pasan al estado de esa posición en ese
+  momento. La carga ya ha terminado, así que el asentamiento llega tras el intervalo corto sin desplazamiento
+  (como muy tarde 1 s después); hasta entonces ningún titular ni texto ya visible se oculta, y después solo
+  quedan pendientes los titulares de debajo de la ventana (RF-19).
+- **Impresión** con la cortina de Proyectos por debajo de 1, con el hero inclinado por el puntero o durante
+  el revelado de un titular: primer escenario completo, hero sin inclinación y titular completo (RF-20).
 - **Cambio de ancho o de tamaño de texto antes del revelado** (giro, redimensionado, zoom, tamaño de texto
   del navegador): el titular se revela con las líneas que tiene en el momento del revelado (RF-14).
 - **Cambio de ancho o de tamaño de texto durante el revelado** (900 ms como máximo): las líneas en curso
@@ -281,6 +320,13 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   la cortina a 0,5; titulares revelados.
 - Capturas con movimiento reducido, sin JavaScript, con el script principal bloqueado (pasados 2,5 s) y en
   modo impresión, con todo en su estado final.
+- Medidas automáticas de la carga en escritorio y en el proyecto móvil: al recargar a mitad de página y al
+  abrir `/#servicios`, ningún titular visto llega a estar pendiente, recortado ni animado en ningún momento
+  de la carga, y los de debajo de la ventana quedan pendientes como muy tarde 1 s después de ejecutarse el
+  script (más el margen de medida).
+- Medidas automáticas de impresión: primer escenario sin recorte con la cortina de Proyectos por debajo de 1,
+  escena del hero sin rotación tras inclinarla con el puntero y titular a medio revelar con todas sus
+  líneas sin desplazamiento y con opacidad 1.
 - CLS y tareas largas medidos según el requisito de estabilidad, con el resultado documentado.
 - Incremento de peso respecto a la base, en bytes, dentro de la parte de esta spec.
 - Revisión de @reviewer con veredicto APROBADO.
@@ -296,8 +342,20 @@ recorta contenido ni excluye a quien navega con teclado, en táctil o con movimi
   recalculado si cambian el ancho o el tamaño de texto antes del revelado; una línea se revela como bloque;
   móvil sin escalonado (RF-14, RF-15, RF-17).
 - Cortinas siempre reversibles, también en las secciones vistas al cargar; los titulares se revelan una
-  sola vez por carga y lo visto al ejecutarse el script queda revelado sin animación (RF-7, RF-16, RF-19).
+  sola vez por carga y lo visto queda revelado sin animación (RF-7, RF-16, RF-19). El momento en que se
+  decide qué está visto lo fija el cambio de requisitos de abajo.
 - Autorizada la ampliación de la skill motion-rules con el progreso por sección de las cortinas.
+
+## Decisiones del usuario (cambio de requisitos durante T9)
+- **Esperar a que se asiente**: al recargar o abrir una URL con ancla, el navegador restaura la posición
+  después de ejecutarse el script. Lo «visto» se decide al asentarse la carga (sin desplazamiento durante un
+  intervalo corto tras terminar la carga, como máximo 1 s desde la ejecución del script) y no al
+  ejecutarse el script. Hasta esa decisión no se oculta nada nuevo; lo que queda dentro o por encima de la
+  ventana al decidir queda revelado sin animación y lo de debajo tendrá su revelado. Las cortinas siguen el
+  scroll desde el principio. Aplica también a las palabras de Filosofía (Definiciones, RF-7, RF-12, RF-13,
+  RF-14, RF-16, RF-19).
+- **Impresión completa**: al imprimir, el primer escenario de Proyectos se ve completo, el hero sale sin la
+  inclinación del puntero y un titular a medio revelar sale completo (RF-20).
 
 ## Dudas abiertas
 Ninguna.

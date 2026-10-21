@@ -223,12 +223,16 @@ main:focus {
 }
 
 /* ── Secciones: ritmo común ─────────────────────────────── */
+/* El padding se expone como --pt/--px/--pb: la cortina («marco que se abre») calcula con él sus franjas */
 .philosophy,
 .work,
 .services,
 .process,
 .contact {
-  padding: clamp(6rem, 14vw, 13rem) var(--gutter);
+  --pt: clamp(6rem, 14vw, 13rem);
+  --pb: var(--pt);
+  --px: var(--gutter);
+  padding: var(--pt) var(--px) var(--pb);
 }
 
 [data-theme='dark'] {

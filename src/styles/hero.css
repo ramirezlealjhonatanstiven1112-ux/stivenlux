@@ -63,30 +63,72 @@
   pointer-events: none;
 }
 
-.hero__layer {
-  position: absolute;
+/* Al empezar la salida la inclinación vuelve a neutro en 0,5 s (RF-6: ≤ 600 ms) */
+.hero.is-leaving .hero__stage {
+  transition-duration: 0.5s;
 }
 
-/* Profundidad en scroll: cada capa se separa a su propio ritmo */
+/* Salida ligada al scroll (spec 001, RF-2 a RF-4): cada capa se separa en profundidad según
+   --hero-p (0 → 1 en la primera pantalla). Amplitudes por capa y perfil:
+   --es = escala − 1 con p = 1 · --ex / --ey = desplazamiento con p = 1, en vh.
+   Lineal: con p = 0,5 todo vale la mitad. La escala parte del centro de la capa. */
+.hero__layer {
+  position: absolute;
+  transform: translate3d(calc(var(--hero-p, 0) * var(--ex, 0) * 1vh), calc(var(--hero-p, 0) * var(--ey, 0) * 1vh), 0)
+    scale(calc(1 + var(--hero-p, 0) * var(--es, 0)));
+}
+
+/* Escritorio: el fondo se aleja hacia arriba, la intermedia va a la derecha y abajo,
+   el teléfono avanza hacia la izquierda y abajo; crecen las tres distancias entre centros. */
 .hero__layer--back {
+  --es: -0.14;
+  --ey: -8;
   top: 0;
   left: 0;
   width: 78%;
-  transform: translate3d(0, calc(var(--hero-p, 0) * -6vh), 0);
 }
 
 .hero__layer--mid {
+  --es: -0.03;
+  --ex: 6;
+  --ey: 3;
   top: 45%;
   left: 37%;
   width: 63%;
-  transform: translate3d(calc(var(--hero-p, 0) * 4vw), calc(var(--hero-p, 0) * -14vh), 0);
 }
 
 .hero__layer--front {
+  --es: 0.115;
+  --ex: -3;
+  --ey: 10;
   top: 41%;
   left: 7%;
   width: 18.5%;
-  transform: translate3d(calc(var(--hero-p, 0) * -3vw), calc(var(--hero-p, 0) * -24vh), 0);
+}
+
+/* Escritorio bajo (alto < 500 px, p. ej. 844×390): la mitad de recorrido */
+@media (min-width: 48em) and (max-height: 499.98px) {
+  .hero__layer--back {
+    --es: -0.07;
+    --ey: -5;
+  }
+
+  .hero__layer--mid {
+    --es: -0.015;
+    --ex: 4;
+    --ey: 2;
+  }
+
+  .hero__layer--front {
+    --es: 0.0575;
+    --ex: -2;
+    --ey: 6;
+  }
+}
+
+/* Con el video del hero no hay separación de dispositivos (RF-2) */
+.hero.is-video .hero__layer {
+  transform: none;
 }
 
 .hero__device {
@@ -260,7 +302,10 @@
     transform: none;
   }
 
+  /* Salida más contenida en móvil (RF-3); la capa intermedia no existe */
   .hero__layer--back {
+    --es: -0.055;
+    --ey: -5;
     top: 4%;
     left: 6%;
     width: 112%;
@@ -271,6 +316,9 @@
   }
 
   .hero__layer--front {
+    --es: 0.05;
+    --ex: 2;
+    --ey: 5;
     top: 26%;
     left: 52%;
     width: 37%;
@@ -282,6 +330,20 @@
 
   .hero__device--front {
     --tf: perspective(1200px) rotateY(-8deg) rotateZ(-3deg);
+  }
+}
+
+/* Móvil bajo (p. ej. 667×375): la mitad de la salida móvil */
+@media (max-width: 47.99em) and (max-height: 499.98px) {
+  .hero__layer--back {
+    --es: -0.0275;
+    --ey: -3;
+  }
+
+  .hero__layer--front {
+    --es: 0.025;
+    --ex: 1;
+    --ey: 3;
   }
 }
 

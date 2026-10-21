@@ -1,0 +1,130 @@
+/* ── Movimiento de la spec 001 ──────────────────────────── */
+
+/* Grosores del marco de cortina: registrados para resolverse en px (los tests los leen ya calculados) */
+@property --ft {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fr {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fb {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fl {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cortina («marco que se abre»): un marco del tono anterior, detrás del contenido, que se estrecha con
+     --c (0 → 1, escrito por scroll-fx.js). Cada franja mide (1 − c)·(padding propio − 8 px): nunca tapa
+     el contenido ni su indicador de foco. Sin --c (sin JS o antes del script) el marco no existe. */
+  .js [data-curtain] {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .js [data-curtain]::before {
+    --ft: calc((1 - var(--c, 1)) * max(0px, var(--pt) - 8px));
+    --fb: calc((1 - var(--c, 1)) * max(0px, var(--pb) - 8px));
+    --fl: calc((1 - var(--c, 1)) * max(0px, var(--px) - 8px));
+    --fr: var(--fl);
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--black);
+    /* El rectángulo exterior sale 1 px de la caja: el borde visible es el de la caja, ajustado al píxel
+       como el fondo de las secciones (si no, queda un filete gris en la frontera) */
+    clip-path: polygon(
+      evenodd,
+      -1px -1px,
+      calc(100% + 1px) -1px,
+      calc(100% + 1px) calc(100% + 1px),
+      -1px calc(100% + 1px),
+      -1px -1px,
+      var(--fl) var(--ft),
+      var(--fl) calc(100% - var(--fb)),
+      calc(100% - var(--fr)) calc(100% - var(--fb)),
+      calc(100% - var(--fr)) var(--ft),
+      var(--fl) var(--ft)
+    );
+  }
+
+  /* Las secciones oscuras vienen de una clara */
+  .js [data-curtain][data-theme='dark']::before {
+    background: var(--white);
+  }
+
+  /* Titulares de sección: pendientes (por debajo de la ventana al asentarse la carga) quedan ocultos con
+     clip-path, sin cambiar el layout y sin salir del árbol de accesibilidad ni de la búsqueda. Al revelarse,
+     cada línea sube desde su máscara (.ln, de reveal.js); al terminar se restaura el texto normal. */
+  .js [data-reveal].is-pending {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  /* flow-root: el margen negativo de la última máscara no sale del titular (misma altura que el texto) */
+  .js .is-revealing {
+    display: flow-root;
+  }
+
+  .js .is-revealing .ln {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+    margin-bottom: -0.06em;
+  }
+
+  .js .is-revealing .ln > span {
+    display: block;
+    animation: hero-line var(--rd) var(--ease-out) calc(var(--li) * var(--rs)) both;
+  }
+}
+
+/* Al imprimir, todo en su estado final: hero en reposo y sin inclinación, secciones con su fondo completo,
+   escenarios sin recorte, titulares visibles (también a medio revelar) y palabras de filosofía a opacidad
+   completa (mismos selectores, o más específicos, que las reglas que anulan: gana el orden) */
+@media print {
+  .js [data-curtain]::before {
+    content: none;
+  }
+
+  .js [data-reveal].is-pending {
+    clip-path: none;
+  }
+
+  .hero__layer {
+    transform: none;
+  }
+
+  .philosophy__statement .w {
+    opacity: 1;
+  }
+
+  /* --e va en línea (no se puede anular): se quita el recorte que lo usa (RF-13) */
+  .project__stage {
+    clip-path: none;
+  }
+
+  /* Sin la inclinación del puntero y sin transición al cambiar de medio */
+  .hero .hero__stage {
+    transform: none;
+    transition: none;
+  }
+
+  /* Titular a medio revelar: cada línea en su sitio */
+  .js .is-revealing .ln > span {
+    animation: none;
+  }
+}
