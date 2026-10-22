@@ -1,6 +1,6 @@
 # Spec 001 — Hero cinematográfico y transiciones de scroll
 
-Estado: aprobada
+Estado: implementada
 
 > Amplía la spec 000 (línea base). Todo lo que la spec 000 exige se sigue cumpliendo (RF-22).
 > Las microinteracciones de puntero (cursor complementario, botones magnéticos y hovers) se tratan en la

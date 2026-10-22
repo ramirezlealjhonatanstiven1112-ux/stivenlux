@@ -75,9 +75,12 @@
   /* Pie del hero mientras se abre la cortina de Filosofía: el hero recorta lo que sale de su caja y, con la
      franja blanca de esa cortina debajo, el recorte de la sombra (o del teléfono) se vería como una línea.
      Filosofía, que se pinta encima del hero, pone justo sobre su borde un degradado de blanco transparente
-     a blanco (completo 2 px antes del borde, donde empieza la solapa del marco): la sombra se funde con la
-     franja. Solo existe mientras hay franja (opacidad 1 hasta c = 0,9 y
-     0 en c = 1): con la cortina abierta, sin JS o con movimiento reducido todo queda como antes. */
+     a blanco: la sombra o el dispositivo se funden con la franja. El degradado sigue una curva suave
+     (smoothstep muestreado) que llega al 98,5 % 4 px antes del borde y a blanco 2 px antes, donde empieza la
+     solapa del marco: junto al borde no queda pendiente brusca ni recorte residual. Vive y desaparece con
+     la solapa: usa su mismo factor (×100000, como --fx), así que vale 1 mientras la solapa está pintada
+     (todo c < 1: scroll-fx.js escribe c con 4 decimales, (1 − c)·100000 ≥ 10) y 0 en c = 1. Con la
+     cortina abierta, sin JS o con movimiento reducido todo queda como antes. */
   .js .philosophy::after {
     content: '';
     position: absolute;
@@ -85,12 +88,23 @@
     bottom: 100%;
     left: 0;
     height: 3rem;
-    background: linear-gradient(rgb(255 255 255 / 0), var(--white) calc(100% - 2px));
-    opacity: clamp(0, (1 - var(--c, 1)) * 10, 1);
+    background: linear-gradient(
+      rgb(255 255 255 / 0),
+      rgb(255 255 255 / 0.042) calc((100% - 4px) * 0.125),
+      rgb(255 255 255 / 0.154) calc((100% - 4px) * 0.25),
+      rgb(255 255 255 / 0.311) calc((100% - 4px) * 0.375),
+      rgb(255 255 255 / 0.493) calc((100% - 4px) * 0.5),
+      rgb(255 255 255 / 0.674) calc((100% - 4px) * 0.625),
+      rgb(255 255 255 / 0.831) calc((100% - 4px) * 0.75),
+      rgb(255 255 255 / 0.943) calc((100% - 4px) * 0.875),
+      rgb(255 255 255 / 0.985) calc(100% - 4px),
+      var(--white) calc(100% - 2px)
+    );
+    opacity: clamp(0, (1 - var(--c, 1)) * 100000, 1);
     pointer-events: none;
   }
 
-  /* En móvil el teléfono queda a 11–36 px del borde: un degradado corto no lo empaña */
+  /* En móvil el teléfono queda cerca del borde: un degradado corto no lo empaña */
   @media (max-width: 47.99em) {
     .js .philosophy::after {
       height: 1rem;

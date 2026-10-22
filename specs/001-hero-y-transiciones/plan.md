@@ -371,11 +371,19 @@ de impresión. Notas de T9:
   1366×600, 844×390 o en iPhone, el propio dispositivo) llega a su borde inferior; con la franja blanca de la
   cortina de Filosofía debajo, el recorte se veía como una línea. `.js .philosophy::after` (bajo
   `no-preference`, `content: none` al imprimir), pegado encima del borde superior de Filosofía
-  (`bottom: 100%`), es un degradado de blanco transparente a blanco (completo 2 px antes del borde, donde
-  empieza la solapa del marco) de 3 rem (1 rem en móvil, para no empañar el teléfono, que queda a 11–36 px
-  del borde). Filosofía se pinta después del hero, así que el degradado queda encima de la sombra. Su
-  `opacity` es `clamp(0, (1 − c) · 10, 1)`: 1 hasta c = 0,9 y 0 en c = 1, así que solo existe mientras hay
-  franja blanca; con la cortina abierta, sin JS o con movimiento reducido el borde queda como en la spec 000.
+  (`bottom: 100%`), es un degradado suave de blanco transparente a blanco (smoothstep muestreado) que llega
+  al 98,5 % 4 px antes del borde y a blanco 2 px antes, donde empieza la solapa del marco. Mide 3 rem en
+  escritorio y 1 rem en móvil (corto para no empañar el teléfono, que queda cerca del borde). Filosofía se
+  pinta después del hero, así que el degradado queda encima de la sombra. Su `opacity` es
+  `clamp(0, (1 − c) · 100000, 1)`, el mismo factor que la solapa (`--fx`): vale 1 mientras la solapa esté
+  pintada (todo c < 1, porque `scroll-fx.js` escribe c con 4 decimales y (1 − c) · 100000 ≥ 10) y 0 en
+  c = 1, así que degradado y solapa viven y desaparecen juntos. Con la cortina abierta, sin JS o con
+  movimiento reducido el borde queda como en la spec 000. En la vuelta 2 cambió porque, con el factor 10,
+  el degradado se apagaba entre c = 0,9 y 1 con la franja aún visible (el corte reaparecía), y el degradado
+  lineal dejaba saltos de 5–13 niveles junto al borde a 844×390 (6–9) y 360×640 (5–13). En la vuelta 3,
+  porque con el factor 200 quedaba un tramo de 1–3 px de scroll, c ∈ (0,995, 1), con la solapa pintada y el
+  degradado a medio apagar (opacidad entre 0,12 y 0,98), y el dispositivo volvía a terminar en recto sobre
+  una línea blanca (hasta 225 niveles a 1366×600).
   Descartados: dejar desbordar la sombra (`overflow-x: clip` / `overflow-clip-margin`), porque Filosofía se
   pinta después y la taparía igual, y subir el hero por encima haría que los dispositivos pisaran Filosofía;
   y un degradado fijo en el propio hero, porque con c = 1 dejaba una banda blanca entre el teléfono y el
@@ -519,7 +527,7 @@ Ayudas en `tests/e2e/support/motion.js`: `open(page)` (como el de la spec 000, r
 | `curtains` · Tab por todos los enfocables: anillo (caja + 6 px) dentro del plano y por encima del hero | escritorio | RF-21 |
 | `curtains` (validación) · CTA de Contacto enfocados con `preventScroll` con su cortina a 0 y a 0,5, sin llegar al final: indicador visible y anillo dentro del plano | 1440×900, móvil | RF-21 |
 | `curtains` (validación) · franja superior de cada frontera a c = 0,25/0,5/0,75, de 1 px por encima del borde a 1 px antes del plano, a todo el ancho: tono anterior ±2 en cada píxel de dispositivo | DPR 1,25 (1440×900), 1,5 (1366×768), 2,625 (Pixel 7), 3 (iPhone 13) | RF-8 |
-| `curtains` (validación) · borde inferior del hero con la cortina de Filosofía en curso: ningún salto > 4 niveles entre filas de dispositivo de 4 px por encima a 2 px por debajo | 1440×900, móvil | HU-1, RF-8 |
+| `curtains` (validación) · borde inferior del hero con la cortina de Filosofía en curso y la entrada del hero terminada: ningún salto > 4 niveles entre filas de dispositivo de 4 px por encima a 2 px por debajo (si la franja mide menos de 3 px, la banda termina 1 px antes del final de la franja); progresos de salida 0,1–0,6, cortina a 0,25/0,5/0,75/0,9/0,95/0,98, con 0,95 y 0,98 obligatorias, y última posición entera de scroll antes de c = 1 (obligatoria, con 0,99 < c < 1 aplicada: franja de menos de 1 px y solapa pintada) | 1440×900, móvil; 1366×600 y 844×390 con contextos propios desde `escritorio` | HU-1, RF-8 |
 | `reveal` · Filosofía: c = 0,9 → titular pendiente y palabras a 0,18; c = 1 → revela; palabras a 1 en el centro | 1440×900, móvil | RF-12 |
 | `reveal` · Proyectos: c = 0,9 → titular pendiente y primer escenario sin abrir | 1440×900, 1366×600, 844×390, móvil | RF-13 |
 | `reveal` · nº de máscaras = nº de líneas de `Range.getClientRects()` medido justo antes; escalonado 80–120 ms; fin ≤ 900 ms desde el `scrollTo` que cumple la condición, arranque incluido (`startTime` + `endTime` de `getAnimations()`) | 1440×900 | RF-14 |

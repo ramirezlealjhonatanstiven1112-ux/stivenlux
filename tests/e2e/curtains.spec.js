@@ -1,6 +1,7 @@
 import { test, expect, devices } from '@playwright/test';
 import {
   open,
+  heroEntranceDone,
   pixelBand,
   scrollToHeroProgress,
   scrollToY,
@@ -352,22 +353,76 @@ for (const density of DENSITIES) {
 /* HU-1 y RF-8: el hero recorta lo que sale de su caja. Mientras la cortina de Filosofía está en curso, su
    franja blanca queda justo debajo, así que la sombra (o el propio dispositivo) no puede terminar en un
    corte: entre 4 px por encima del borde del hero y 2 px por debajo, ninguna fila de dispositivo cambia más
-   de 4 niveles respecto a la anterior. */
-test('HU-1 · la sombra de los dispositivos no se corta en el borde del hero mientras se abre la cortina de Filosofía', async ({ page }) => {
+   de 4 niveles respecto a la anterior. Se mide con la entrada del hero terminada: durante la entrada el
+   teléfono llega desde más abajo y puede cruzar el borde, y la spec (spec.md:288, «Scroll durante la entrada
+   del hero») solo regula el estado al terminar la entrada. Se recorren los progresos de salida 0,1–0,6, la
+   cortina de Filosofía hasta cerca de 1 (0,95 y 0,98), donde la franja ya es estrecha, y la última posición
+   entera de scroll antes de que la cortina llegue a 1 (obligatoria), donde la franja mide menos de 1 px pero
+   la solapa del marco sigue pintada. Si la franja mide menos de 3 px, la banda termina 1 px antes del final
+   de la franja (por debajo empieza el plano negro): con menos de 1 px termina dentro de la solapa, así que
+   sigue cubriendo de 4 px por encima del borde a 1 px por encima, como mínimo. */
+async function heroEdgeChecks(page) {
   const errors = await open(page);
+  await heroEntranceDone(page);
   let checked = 0;
-  for (const p of [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]) {
-    await scrollToHeroProgress(page, p);
+  let nearOpen = 0;
+  const measure = async (label) => {
     const c = await waitCurtainApplied(page, 'filosofia');
     const { bottom, vh } = await page.evaluate(() => ({ bottom: document.querySelector('.hero').getBoundingClientRect().bottom, vh: window.innerHeight }));
-    if (c <= 0 || c >= 1 || bottom > vh - 4) continue;
-    const band = await pixelBand(page, { from: bottom - 4, to: bottom + 2 });
-    expect(band.worst, `progreso ${p} (cortina ${c.toFixed(2)}): sin corte en el borde (${JSON.stringify(band.at)})`).toBeLessThanOrEqual(4);
+    if (c <= 0 || c >= 1 || bottom > vh - 4) return false;
+    const { ft } = await frame(page, 'filosofia');
+    expect(ft, `${label} (cortina ${c.toFixed(3)}): hay franja`).toBeGreaterThan(0);
+    const band = await pixelBand(page, { from: bottom - 4, to: bottom + Math.min(2, ft - 1) });
+    expect(band.worst, `${label} (cortina ${c.toFixed(3)}, franja ${ft.toFixed(1)} px): sin corte en el borde (${JSON.stringify(band.at)})`).toBeLessThanOrEqual(4);
     checked++;
+    return true;
+  };
+  for (const p of [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]) {
+    await scrollToHeroProgress(page, p);
+    await measure(`progreso ${p}`);
   }
-  expect(checked, 'posiciones con la cortina de Filosofía en curso').toBeGreaterThanOrEqual(2);
+  for (const target of [0.25, 0.5, 0.75, 0.9, 0.95, 0.98]) {
+    if ((await scrollToCurtain(page, 'filosofia', target)) === null) continue;
+    if ((await measure(`cortina ${target}`)) && target >= 0.95) nearOpen++;
+  }
+  /* Cola: scroll-fx.js escribe c con 4 decimales, así que se busca hacia atrás desde el final del tramo hasta
+     que la c aplicada baja de 1 (se espera a que la aplicada coincida con la de la posición, a 3 decimales,
+     para no leer la de la posición anterior). */
+  const applied = () => page.evaluate(() => Number(document.getElementById('filosofia').style.getPropertyValue('--c')));
+  const { end } = await curtainRangeOf(page, 'filosofia');
+  let tail = 1;
+  for (let y = Math.ceil(end) - 1; tail >= 1 && y >= Math.ceil(end) - 3; y--) {
+    await scrollToY(page, y);
+    const expected = await expectedCurtain(page, 'filosofia');
+    await expect.poll(applied).toBeCloseTo(expected, 3);
+    tail = await applied();
+  }
+  expect(tail, 'última posición antes de c = 1: la cortina sigue en curso').toBeLessThan(1);
+  expect(tail, 'última posición antes de c = 1: cae en la cola (c > 0,99)').toBeGreaterThan(0.99);
+  expect(await measure(`última posición antes de c = 1 (c aplicada ${tail})`), 'la última posición antes de c = 1 se mide').toBe(true);
+  expect(checked, 'posiciones con la cortina de Filosofía en curso').toBeGreaterThanOrEqual(4);
+  expect(nearOpen, 'posiciones con la cortina de Filosofía cerca de 1 (0,95 y 0,98)').toBe(2);
   expect(errors).toEqual([]);
+}
+
+test('HU-1 · la sombra de los dispositivos no se corta en el borde del hero mientras se abre la cortina de Filosofía', async ({ page }) => {
+  await heroEdgeChecks(page);
 });
+
+/* Ventanas bajas, donde el propio dispositivo llega al borde del hero. Contextos propios con
+   browser.newContext, así que se prueba solo desde el proyecto `escritorio`. */
+for (const size of [
+  { width: 1366, height: 600 },
+  { width: 844, height: 390 },
+]) {
+  test(`HU-1 · ${size.width}×${size.height} · la sombra y los dispositivos no se cortan en el borde del hero mientras se abre la cortina de Filosofía`, async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name !== 'escritorio', 'Contextos propios: se prueba una vez');
+    const context = await browser.newContext({ viewport: size, baseURL: testInfo.project.use.baseURL });
+    const page = await context.newPage();
+    await heroEdgeChecks(page);
+    await context.close();
+  });
+}
 
 test('RF-20 · al imprimir no hay marco, aunque una cortina esté a 0,5', async ({ page }) => {
   await open(page);
