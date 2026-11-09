@@ -68,8 +68,10 @@
   transition: transform 0.45s var(--ease-out);
 }
 
-.nav__cta:hover::after {
-  transform: scaleX(1);
+@media (hover: hover) {
+  html:not(.fx) .nav__cta:hover::after {
+    transform: scaleX(1);
+  }
 }
 
 .nav__toggle {
@@ -181,9 +183,11 @@ html:not(.js) .nav__toggle {
   transition-delay: calc(0.25s + var(--i, 0) * 0.06s), 0s;
 }
 
-.menu__link:hover {
-  color: var(--blue);
-  color: color-mix(in srgb, var(--blue) 55%, var(--white));
+@media (hover: hover) {
+  .menu__link:hover {
+    color: var(--blue);
+    color: color-mix(in srgb, var(--blue) 55%, var(--white));
+  }
 }
 
 .menu__foot {

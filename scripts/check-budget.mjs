@@ -7,10 +7,11 @@ import { gzipSync } from 'node:zlib';
 import { budgetCheck } from '../src/lib/budget.js';
 
 const LIMITS = { js: 15 * 1024, css: 20 * 1024 };
-// Spec 001, build de 5f01f29: base medida por el coordinador y margen aprobado por el usuario.
-const SPEC = '001';
-const BASE = { js: 2236, css: 10080 };
-const ALLOWANCE = { js: 2560, css: 3072 };
+// Spec 002, build limpio de 0f6b12d (medido en T1) y margen aprobado por el usuario. JS: +1.536 B más 100 B
+// del sobrante de la 001, autorizados por el usuario en la 1.ª vuelta de corrección (2026-10-25).
+const SPEC = '002';
+const BASE = { js: 3965, css: 10731 };
+const ALLOWANCE = { js: 1636, css: 2048 };
 
 for (const arg of process.argv.slice(2)) {
   const match = /^--allowance-(js|css)=(-?\d+)$/.exec(arg);

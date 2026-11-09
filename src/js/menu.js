@@ -23,6 +23,7 @@ export function initMenu() {
     label.textContent = open ? 'Cerrar' : 'Menú';
     menu.inert = !open;
     outside.forEach((el) => (el.inert = open));
+    document.dispatchEvent(new window.Event('menuchange')); // microinteracciones: el menú entra en transición
 
     if (open) links[0]?.focus({ preventScroll: true });
     else if (restoreFocus) toggle.focus({ preventScroll: true });

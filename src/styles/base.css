@@ -161,9 +161,28 @@ main:focus {
   transition: transform 0.55s var(--ease-out);
 }
 
-.btn:hover::before,
 .btn:focus-visible::before {
   transform: scaleX(1);
+}
+
+/* Hovers solo donde hay hover: en táctil no quedan pegados tras tocar (spec 002, RF-16). Con el script
+   ejecutado (.fx) ceden ante los barridos con dirección de micro.css */
+@media (hover: hover) {
+  html:not(.fx) .btn:hover::before {
+    transform: scaleX(1);
+  }
+
+  html:not(.fx) .btn--light:hover {
+    --btn-fg: var(--white);
+  }
+
+  html:not(.fx) .btn--blue:hover {
+    --btn-fg: var(--blue);
+  }
+
+  html:not(.fx) .link:hover::after {
+    transform: scaleX(0);
+  }
 }
 
 .btn:active {
@@ -175,7 +194,6 @@ main:focus {
   --btn-fg: var(--black);
 }
 
-.btn--light:hover,
 .btn--light:focus-visible {
   --btn-fg: var(--white);
 }
@@ -185,7 +203,6 @@ main:focus {
   --btn-fill: var(--white);
 }
 
-.btn--blue:hover,
 .btn--blue:focus-visible {
   --btn-fg: var(--blue);
 }
@@ -216,10 +233,6 @@ main:focus {
   background: currentColor;
   transform-origin: right;
   transition: transform 0.5s var(--ease-out);
-}
-
-.link:hover::after {
-  transform: scaleX(0);
 }
 
 /* ── Secciones: ritmo común ─────────────────────────────── */

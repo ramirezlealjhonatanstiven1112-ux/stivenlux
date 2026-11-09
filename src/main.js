@@ -8,12 +8,14 @@ import './styles/devices.css';
 import './styles/hero.css';
 import './styles/sections.css';
 import './styles/motion.css';
+import './styles/micro.css';
 
 import { initMenu } from './js/menu.js';
 import { initNavTone } from './js/nav-tone.js';
 import { initWhatsapp } from './js/whatsapp.js';
 import { initScrollFx, splitWords } from './js/scroll-fx.js';
 import { initHeroTilt, initHeroVideo } from './js/hero.js';
+import { initPointer } from './js/pointer.js';
 
 const root = document.documentElement;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -37,3 +39,8 @@ if (!reducedMotion) {
   initHeroTilt();
   initHeroVideo();
 }
+
+// Siempre, también con movimiento reducido: responde a los cambios de preferencia y de puntero
+initPointer();
+// El script principal se ha ejecutado: activa las microinteracciones (spec 002, RF-17)
+root.classList.add('fx');

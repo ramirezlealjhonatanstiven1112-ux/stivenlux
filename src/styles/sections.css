@@ -271,9 +271,6 @@
   transition: transform 0.7s var(--ease-out);
 }
 
-.service:hover::before {
-  transform: scaleX(1);
-}
 
 .service__name {
   font-family: var(--serif);
@@ -283,8 +280,15 @@
   transition: transform 0.6s var(--ease-out);
 }
 
-.service:hover .service__name {
-  transform: translateX(0.5rem);
+/* Solo con hover y fuera de un toque en un híbrido (is-touch): en táctil la fila queda estática (RF-15) */
+@media (hover: hover) {
+  html:not(.is-touch) .service:hover::before {
+    transform: scaleX(1);
+  }
+
+  html:not(.is-touch) .service:hover .service__name {
+    transform: translateX(0.5rem);
+  }
 }
 
 .service__body {
@@ -447,8 +451,10 @@
   transition: color 0.3s ease;
 }
 
-.footer__nav a:hover {
-  color: var(--white);
+@media (hover: hover) {
+  html:not(.fx) .footer__nav a:hover {
+    color: var(--white);
+  }
 }
 
 .footer__wordmark {

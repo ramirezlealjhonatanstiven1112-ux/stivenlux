@@ -23,6 +23,42 @@ import { seenOnSettle, settleCheck } from '../lib/reveal.js';
 import { toWords } from '../lib/words.js';
 import { createReveal, revealTitle } from './reveal.js';
 
+/* Planificador único de fotogramas (spec 002): un solo listener de scroll, uno de resize y un solo
+   requestAnimationFrame para todos los efectos. Cada hook { read, write } se despierta con el scroll o con su
+   propia petición; en cada fotograma se hacen primero todas las lecturas y después todas las escrituras. */
+const hooks = [];
+let frame = 0;
+
+function run() {
+  frame = 0;
+  const due = hooks.filter((h) => h.due);
+  for (const h of due) h.due = false;
+  for (const h of due) h.read?.();
+  for (const h of due) h.write?.();
+}
+
+const schedule = () => {
+  if (!frame) frame = requestAnimationFrame(run);
+};
+
+function all() {
+  for (const h of hooks) h.due = true;
+  schedule();
+}
+
+/* Registra un hook y devuelve la función que le pide un fotograma solo a él. */
+export function addFrameHook(hook) {
+  if (!hooks.length) {
+    window.addEventListener('scroll', all, { passive: true });
+    window.addEventListener('resize', all);
+  }
+  hooks.push(hook);
+  return () => {
+    hook.due = true;
+    schedule();
+  };
+}
+
 export function initScrollFx(ready = Promise.resolve()) {
   const visible = new Set();
   const hero = document.querySelector('.hero');
@@ -43,15 +79,12 @@ export function initScrollFx(ready = Promise.resolve()) {
   let settleTimer = 0;
   let philosophySeen = false;
   let isReady = false;
-  let frame = 0;
   let words = '';
   let firstE = '';
   let heroP = '';
   let leaving = false;
 
   function update() {
-    frame = 0;
-
     // Lecturas: todas antes de escribir, para no forzar layouts intermedios
     const vh = window.innerHeight;
     const y = window.scrollY;
@@ -154,9 +187,9 @@ export function initScrollFx(ready = Promise.resolve()) {
     for (const title of titles) revealTitle(title, !desktop.matches);
   }
 
-  const request = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
+  // update() lee y luego escribe, como antes; va en la fase de escritura para no intercalarse con otras
+  // lecturas (las de los demás hooks ya se han hecho)
+  const request = addFrameHook({ write: update });
 
   function onLoad() {
     loadedAt = window.performance.now();
@@ -175,8 +208,6 @@ export function initScrollFx(ready = Promise.resolve()) {
   );
 
   document.querySelectorAll('[data-scroll]').forEach((el) => observer.observe(el));
-  window.addEventListener('scroll', request, { passive: true });
-  window.addEventListener('resize', request);
   if (loadedAt === null) window.addEventListener('load', onLoad, { once: true });
   request();
   ready.then(() => {

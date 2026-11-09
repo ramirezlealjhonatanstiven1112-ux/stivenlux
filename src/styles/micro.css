@@ -1,0 +1,311 @@
+/* ── Microinteracciones de puntero (spec 002) ─────────────── */
+/* Bordes del subrayado o del barrido: --sa (izquierdo) y --sb (derecho), en porcentaje y animables */
+@property --sa {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+@property --sb {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+/* Cursor complementario: acompaña al del sistema sin sustituirlo. Disco de 8 px (blanco con borde negro) y,
+   sobre lo pulsable, aro de 40 px (1 px negro por fuera, 1 px blanco por dentro) sin relleno (RF-1–RF-5) */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  pointer-events: none;
+  transition:
+    transform 0.08s var(--ease-out),
+    opacity 0.12s;
+}
+
+.cursor.is-off {
+  opacity: 0;
+  transition: none;
+}
+
+.cursor i {
+  position: absolute;
+  border-radius: 50%;
+  transition:
+    transform 0.12s var(--ease-out),
+    opacity 0.12s;
+}
+
+.cursor i:first-child {
+  width: 8px;
+  height: 8px;
+  margin: -4px;
+  border: 1px solid #000;
+  background: #fff;
+}
+
+.cursor i:last-child {
+  width: 40px;
+  height: 40px;
+  margin: -20px;
+  border: 1px solid #000;
+  box-shadow: inset 0 0 0 1px #fff;
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+/* Sin relleno desde que se detecta el pulsable: el disco desaparece sin transición */
+.cursor.is-ring i:first-child {
+  opacity: 0;
+  transition: none;
+}
+
+.cursor.is-ring i:last-child {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce), (forced-colors: active), print {
+  .cursor {
+    display: none;
+  }
+}
+
+/* Botones magnéticos: se desplazan hacia el puntero sin sobrepasar el destino (curva sin rebote). Un ::after
+   invisible contratrasladado mantiene pulsable el área de reposo mientras el botón se mueve (RF-7, RF-9) */
+/* El desplazamiento solo existe cuando el script ha escrito un destino (--mgx en línea): al cargar, el valor
+   no cambia de `none` y no nace ninguna transición sin una acción del visitante */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .fx [data-magnet] {
+    overflow: visible;
+    transition:
+      color 0.4s var(--ease-out),
+      translate 0.16s var(--ease-out);
+  }
+
+  .fx [data-magnet]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transition: translate 0.16s var(--ease-out);
+  }
+
+  .fx [data-magnet][style*='--mgx'] {
+    translate: var(--mgx) var(--mgy);
+  }
+
+  .fx [data-magnet][style*='--mgx']::after {
+    translate: calc(var(--mgx) * -1) calc(var(--mgy) * -1);
+  }
+}
+
+/* Hovers con dirección (RF-10, RF-11): solo con hover y con el script ejecutado (.fx). Dos bordes animables:
+   reposo (0, 0) sin transición; :hover (0, 100 %): entra por la izquierda; .is-out (100 %, 100 %): sale por la
+   derecha. JS pone .is-out al salir el puntero y lo quita al acabar; si se interrumpe, sigue desde donde
+   está. Con :focus-visible, el estado final al instante (RF-12) */
+@media (hover: hover) {
+  /* Barrido de los 3 botones: el relleno es una banda de fondo entre los dos bordes */
+  .fx .btn {
+    --sweep: linear-gradient(90deg, #0000 var(--sa), var(--btn-fill) 0 var(--sb), #0000 0);
+    background-image: var(--sweep);
+    transition: translate 0.16s var(--ease-out);
+  }
+
+  .fx .btn::before {
+    content: none;
+  }
+
+  .fx :is(.btn, .nav__cta, .footer__nav a):is(:hover, .is-out) {
+    transition:
+      translate 0.16s var(--ease-out),
+      --sa 0.34s var(--ease-out),
+      --sb 0.34s var(--ease-out);
+  }
+
+  .fx :is(.btn, .nav__cta, .footer__nav a).is-out {
+    --sa: 100%;
+    --sb: 100%;
+  }
+
+  .fx:not(.is-touch) :is(.btn, .nav__cta, .footer__nav a):hover {
+    --sa: 0%;
+    --sb: 100%;
+  }
+
+  /* Texto con el mismo frente que el relleno (P1): una sola copia del texto, pintada con una capa de fondo
+     recortada al texto; solo mientras hay barrido. El botón del hero no cambia de color: solo la banda */
+  .fx .btn--light {
+    --hover-fg: var(--white);
+  }
+
+  .fx .btn--blue {
+    --hover-fg: var(--blue);
+  }
+
+  .fx:not(.is-touch) :is(.btn--light, .btn--blue):hover,
+  .fx :is(.btn--light, .btn--blue).is-out {
+    color: #0000;
+    background-image:
+      linear-gradient(90deg, var(--btn-fg) var(--sa), var(--hover-fg) 0 var(--sb), var(--btn-fg) 0), var(--sweep);
+    -webkit-background-clip: text, padding-box;
+    background-clip: text, padding-box;
+  }
+
+  /* Subrayados de la barra y del pie: recorte entre los dos bordes */
+  .fx :is(.nav__cta, .footer__nav a):is(:hover, .is-out) {
+    transition:
+      color 0.3s ease,
+      --sa 0.24s var(--ease-out),
+      --sb 0.24s var(--ease-out);
+  }
+
+  .fx .nav__cta::after,
+  .fx .footer__nav a::after {
+    clip-path: inset(0 calc(100% - var(--sb)) 0 var(--sa));
+    transform: none;
+    transition: none;
+  }
+
+  .fx .footer__nav a {
+    position: relative;
+  }
+
+  .fx .footer__nav a::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0.6rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .fx:not(.is-touch) .footer__nav a:hover {
+    color: var(--white);
+  }
+
+  /* «Ver proyectos»: el subrayado sale por la derecha y vuelve por la izquierda; termina aunque el puntero salga */
+  .fx .link.is-relink::after {
+    animation: relink 0.42s var(--ease-in-out);
+  }
+
+  /* RF-12: foco con teclado, estado final al instante y sin imán */
+  .fx :is(.btn, .nav__cta, .footer__nav a):focus-visible {
+    --sa: 0%;
+    --sb: 100%;
+    transition: translate 0.16s var(--ease-out);
+  }
+
+  .fx .footer__nav a:focus-visible {
+    color: var(--white);
+  }
+
+  .fx .link:focus-visible::after {
+    animation: none;
+  }
+}
+
+/* Extremos explícitos: entre `none` (el valor de .link::after) e inset() no hay interpolación y el subrayado
+   parpadearía en lugar de barrer */
+@keyframes relink {
+  0%,
+  100% {
+    clip-path: inset(0);
+  }
+
+  45% {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  45.01% {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+/* RF-12 sin hover (tableta con teclado): el mecanismo de foco de hoy, al instante; en reposo, igual que hoy */
+@media (hover: none) {
+  .fx .btn:focus-visible,
+  .fx .btn:focus-visible::before,
+  .fx .nav__cta:focus-visible::after {
+    transition: none;
+  }
+
+  .fx .nav__cta:focus-visible::after {
+    transform: none;
+  }
+
+  .fx .footer__nav a:focus-visible {
+    position: relative;
+    color: var(--white);
+    transition: none;
+  }
+
+  .fx .footer__nav a:focus-visible::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0.6rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+  }
+}
+
+/* Colores forzados (RF-22), con y sin script: botones del sistema con borde visible y sin barrido; sin punto.
+   Con el script, los subrayados de RF-10 en el color de los enlaces del sistema y sin animación; sin script,
+   los de hoy. :not(#_) da especificidad de id: gana a los estados de hover sin !important */
+@media (forced-colors: active) {
+  html:not(#_) .btn {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  html:not(#_) .btn::before {
+    background: none;
+  }
+
+  html.fx:not(#_) :is(.nav__cta, .footer__nav a, .link)::after {
+    forced-color-adjust: none;
+    background: LinkText;
+    transition: none;
+    animation: none;
+  }
+
+  html.fx:not(#_) :is(.nav__cta, .footer__nav a) {
+    transition: none;
+  }
+}
+
+/* Impresión (RF-18): botones en su área de reposo, sin desplazamiento ni barrido a medias */
+@media print {
+  html.fx:not(#_) .btn {
+    translate: none;
+    background-image: none;
+    color: var(--btn-fg);
+    transition: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+  }
+
+  html.fx:not(#_) [data-magnet]::after {
+    translate: none;
+  }
+
+  html.fx:not(#_) :is(.nav__cta, .footer__nav a) {
+    --sa: 0%;
+    --sb: 0%;
+    transition: none;
+  }
+
+  html.fx:not(#_) .link::after {
+    animation: none;
+  }
+
+  html:not(#_) .btn::before {
+    transform: scaleX(0);
+    transition: none;
+  }
+}
