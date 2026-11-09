@@ -1,6 +1,6 @@
 # Spec 002 — Microinteracciones de puntero
 
-Estado: aprobada
+Estado: implementada
 
 > Amplía la spec 000 (línea base) y parte del estado con la spec 001 ya implementada (build del commit
 > `0f6b12d`). Todo lo que exigen la spec 000 y la spec 001 se sigue cumpliendo (RF-19).

@@ -5,7 +5,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - v1 de la landing: hero con ensamblaje de mockups (HTML/CSS/JS), filosofía, 3 proyectos conceptuales, servicios, proceso, contacto y menú de pantalla completa. Spec 000 (línea base) APROBADA por @reviewer.
 - SDD montado: constitución, skill `sdd`, comandos `/sdd-*` y `/coordinator`, subagentes planner, implementer y reviewer.
 - Spec 001 (hero y transiciones) IMPLEMENTADA y VALIDADA (2 reviewers, 3 vueltas de correcciones), en el commit 0f6b12d.
-- Spec 002 (microinteracciones de puntero): T1–T10 hechas, VALIDADA (6 @reviewer, 2 vueltas de corrección) y en commit (2026-11-08, sin push; tampoco 0f6b12d). `npm run check` en verde: 81 unitarios y 206 e2e. Lo que difiere del plan está en plan.md, «Implementado frente al plan».
+- Spec 002 (microinteracciones de puntero): IMPLEMENTADA (T1–T10), VALIDADA (6 @reviewer, 2 vueltas de corrección) en b8d1745 y subida (2026-11-08). `npm run check` en verde: 81 unitarios y 206 e2e. Lo que difiere del plan está en plan.md, «Implementado frente al plan».
   - Base 0f6b12d = JS 3.965 B y CSS 10.731 B. Peso: JS +1.590 B (máx. +1.636: +100 B del sobrante de la 001, decisión 23) y CSS +922 B (máx. +2.048). CLS del recorrido igual que la base (0,000114 / 0,000130). `tests/e2e/fixtures/spec002-base.json` no se regenera.
   - Puerta: tareas largas y `load-states` «/#servicios» (inestables bajo carga; la base también) corren en proyectos aislados de `playwright.config.js` (decisión del usuario); `--project=escritorio` o `movil` no los incluye: añadir `--project=aislado-*`. Verificaciones 4–6 pasan (2026-11-08, navegador integrado; traducción simulada con `<font>` porque el traductor de Chrome no se lanza ni por CDP). Pendientes opcionales del usuario: portátil táctil, tableta, traducción real.
   - Checklist motion-rules: solo transform/opacity/clip-path/translate y color como respuesta (P1); un solo rAF y listener de scroll (`addFrameHook` en scroll-fx.js); sin will-change; nada infinito; todo visible sin JS y con reducido. mockup-screens: no se toca ninguna pantalla; el punto va en `body`, fuera de las capas con `cqw`.
@@ -50,6 +50,6 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - Ediciones con `node -` desde Bash pierden las barras invertidas de las expresiones regulares: usar Edit para código con `\`.
 
 ## Próximos pasos
-- Push de 0f6b12d y del commit de la 002 (el usuario autoriza cada commit y push; sin push una sesión nueva no ve el trabajo). Skill `ahorro` instalada: cargarla al empezar y antes de encargar a subagentes.
+- El usuario autoriza cada commit y push. Skill `ahorro` instalada: cargarla al empezar y antes de encargar a subagentes.
 - Siguiente idea: video del hero con Google Flow (spec pequeña o `/feature`).
 - Siguen pendientes: número de WhatsApp (`src/config/site.js`), `og:image`, dominio, despliegue y video de Higgsfield (la red bloquea `upload.higgsfield.ai` y `d2ol7oe51mr4n9.cloudfront.net`; 10 créditos, solo Grok Lite a 720p; ver `video/higgsfield/PROMPT.md`).
