@@ -22,13 +22,13 @@ async function open(page, { ignoreResource } = {}) {
  * Sustituye la configuración de src/config/site.js en el JS servido por el build, para probar
  * los casos con número de WhatsApp o video sin tocar el archivo real.
  * El minificador conserva las claves del objeto `site` y escribe las cadenas vacías como ``, "" o '',
- * así que se busca `whatsapp:{number:<vacía>` y `heroVideo:{mp4:<vacía>` (con espacios opcionales).
+ * así que se busca `whatsapp:{number:<vacía o dígitos>` y `heroVideo:{mp4:<vacía>` (con espacios opcionales).
  * Si el patrón deja de aparecer (otro minificador, la configuración ya rellena…), el test falla
  * en vez de pasar en falso.
  */
 async function overrideSiteConfig(page, { number, mp4 } = {}) {
   const patterns = [];
-  if (number !== undefined) patterns.push([/(whatsapp\s*:\s*\{\s*number\s*:\s*)(`|"|')\2/, number]);
+  if (number !== undefined) patterns.push([/(whatsapp\s*:\s*\{\s*number\s*:\s*)(`|"|')\d*\2/, number]);
   if (mp4 !== undefined) patterns.push([/(heroVideo\s*:\s*\{\s*mp4\s*:\s*)(`|"|')\2/, mp4]);
   const replaced = new Set();
 
@@ -83,7 +83,9 @@ test('RF-2 · con número válido, los CTA de WhatsApp abren la conversación en
 });
 
 test('RF-3 · sin número configurado, los CTA de WhatsApp llevan a #contacto', async ({ page }) => {
+  const applied = await overrideSiteConfig(page, { number: '' });
   await open(page);
+  applied();
   const hrefs = await page.locator('[data-whatsapp]').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
   expect(hrefs.length).toBeGreaterThanOrEqual(4);
   expect(new Set(hrefs)).toEqual(new Set(['#contacto']));

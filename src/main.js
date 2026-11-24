@@ -1,6 +1,5 @@
 import '@fontsource/instrument-serif/latin-400.css';
 import '@fontsource-variable/inter-tight/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
 
 import './styles/base.css';
 import './styles/nav.css';

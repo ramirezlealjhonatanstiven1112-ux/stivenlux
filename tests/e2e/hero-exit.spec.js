@@ -185,8 +185,11 @@ for (const win of only(['1440×900', '1366×600', '844×390', 'móvil'])) {
     expect(clickAt, 'el CTA principal está a la vista con algún progreso').not.toBeNull();
     await scrollToHeroProgress(page, clickAt);
     const [cta] = (await probe()).slice(2, 3);
+    // Con el número configurado abre WhatsApp en otra pestaña; no se sale a la red
+    await page.context().route(/wa\.me/, (route) => route.abort());
+    const request = page.context().waitForEvent('request', (req) => req.url().startsWith('https://wa.me/'));
     await page.mouse.click(cta.x, cta.y);
-    await expect(page).toHaveURL(/#contacto$/);
+    await request;
   });
 }
 

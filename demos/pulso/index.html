@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pulso · Modelo de demostración de Stiven Lux</title>
+    <meta name="description" content="Tienda de demostración diseñada por Stiven Lux. Negocio ficticio: no vende ni cobra." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#1b1b1d" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/demos/pulso/pulso.css" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+    <script type="module" src="/src/demos/pulso/pulso.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+
+    <aside class="demo" aria-label="Aviso de demostración">
+      <p>Modelo de demostración · negocio ficticio</p>
+      <p class="demo__links">
+        <a href="/#proyectos">Volver a Stiven Lux</a>
+        <a href="/#contacto">Quiero una web así</a>
+      </p>
+    </aside>
+
+    <header class="top">
+      <a class="top__logo" href="#catalogo">Pulso</a>
+      <nav class="top__nav" aria-label="Tienda">
+        <a class="top__link" href="#productos">Catálogo</a>
+        <a class="top__cart" href="#carrito">Carrito <span class="top__count" data-count>0</span></a>
+      </nav>
+    </header>
+
+    <main id="contenido" tabindex="-1">
+      <section class="view is-on" id="catalogo" data-view data-title="Catálogo" aria-labelledby="home-t">
+        <div class="hero">
+          <div class="hero__photo">
+            <picture>
+              <source type="image/avif" srcset="/media/conceptos/tienda-hero-640.avif 640w, /media/conceptos/tienda-hero-1000.avif 1000w, /media/conceptos/tienda-hero-1376.avif 1376w" sizes="(min-width: 48em) 100vw, 150vw" />
+              <source type="image/webp" srcset="/media/conceptos/tienda-hero-640.webp 640w, /media/conceptos/tienda-hero-1000.webp 1000w, /media/conceptos/tienda-hero-1376.webp 1376w" sizes="(min-width: 48em) 100vw, 150vw" />
+              <img src="/media/conceptos/tienda-hero-1000.jpg" alt="Audífonos de diadema Pulso One en grafito, suspendidos sobre fondo crema" width="1376" height="768" fetchpriority="high" />
+            </picture>
+          </div>
+          <div class="hero__copy">
+            <h1 class="hero__title" id="home-t" tabindex="-1">Silencio.<br />Sube el pulso.</h1>
+            <p class="hero__lead">Pulso One: cancelación de ruido y 40 horas de batería.</p>
+            <div class="hero__buy">
+              <a class="add" href="#one">Ver Pulso One</a>
+              <span class="price">$ 459.900</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="shop" id="productos">
+          <div class="shop__head">
+            <h2 class="shop__title">Todo lo que suena contigo</h2>
+            <div class="filters js-only" role="group" aria-label="Filtrar productos">
+              <button type="button" data-filter="todo" aria-pressed="true">Todo</button>
+              <button type="button" data-filter="audio" aria-pressed="false">Audio</button>
+              <button type="button" data-filter="wearables" aria-pressed="false">Wearables</button>
+            </div>
+            <p class="sr" role="status" data-filter-status></p>
+          </div>
+          <ul class="grid">
+            <include src="demos/pulso-card.html" id="one" name="Pulso One" kind="Audífonos de diadema" category="audio" label="$ 459.900" photo="hero" w1="1000" w2="1376" w="1376" h="768" vw="90" vwm="180"></include>
+            <include src="demos/pulso-card.html" id="buds" name="Pulso Buds" kind="Audífonos inalámbricos" category="audio" label="$ 229.900" photo="audifonos" w1="480" w2="960" w="1024" h="1024" vw="46" vwm="92"></include>
+            <include src="demos/pulso-card.html" id="go" name="Pulso Go" kind="Parlante portátil" category="audio" label="$ 189.900" photo="parlante" w1="480" w2="960" w="1024" h="1024" vw="46" vwm="92"></include>
+            <include src="demos/pulso-card.html" id="fit" name="Pulso Fit" kind="Reloj deportivo" category="wearables" label="$ 349.900" photo="reloj" w1="480" w2="960" w="1024" h="1024" vw="46" vwm="92"></include>
+          </ul>
+        </div>
+      </section>
+
+      <include src="demos/pulso-product.html" id="one" name="Pulso One" price="459900" label="$ 459.900" photo="hero" w1="1000" w2="1376" w="1376" h="768" vw="110" vwm="180" alt="Audífonos de diadema Pulso One en grafito" lead="El ruido se queda afuera. Adentro, solo lo que elegiste escuchar." d1="Batería" v1="40 horas" d2="Conexión" v2="Bluetooth y cable" d3="Color" v3="Grafito"></include>
+      <include src="demos/pulso-product.html" id="buds" name="Pulso Buds" price="229900" label="$ 229.900" photo="audifonos" w1="480" w2="960" w="1024" h="1024" vw="58" vwm="100" alt="Audífonos inalámbricos Pulso Buds junto a su estuche abierto" lead="Caben en la palma y te olvidas de que los llevas puestos." d1="Batería" v1="24 horas con estuche" d2="Resistencia" v2="Sudor y lluvia" d3="Color" v3="Grafito"></include>
+      <include src="demos/pulso-product.html" id="go" name="Pulso Go" price="189900" label="$ 189.900" photo="parlante" w1="480" w2="960" w="1024" h="1024" vw="58" vwm="100" alt="Parlante portátil Pulso Go con correa lima" lead="Se cuelga, se moja y sigue sonando. La fiesta va donde vayas." d1="Batería" v1="15 horas" d2="Resistencia" v2="Salpicaduras" d3="Color" v3="Grafito con correa lima"></include>
+      <include src="demos/pulso-product.html" id="fit" name="Pulso Fit" price="349900" label="$ 349.900" photo="reloj" w1="480" w2="960" w="1024" h="1024" vw="58" vwm="100" alt="Reloj deportivo Pulso Fit con correa lima" lead="Tu ritmo a la vista, sin sacar el teléfono del bolsillo." d1="Batería" v1="7 días" d2="Pantalla" v2="Siempre encendida" d3="Correa" v3="Lima, ajustable"></include>
+
+      <section class="view cart js-only" id="carrito" data-view data-title="Carrito" aria-labelledby="cart-t">
+        <h1 class="page-title" id="cart-t" tabindex="-1">Tu carrito</h1>
+        <div class="empty" data-empty>
+          <p>Todavía no hay nada aquí.</p>
+          <a class="add" href="#productos">Ver el catálogo</a>
+        </div>
+        <div class="split" data-filled hidden>
+          <ul class="lines" data-lines></ul>
+          <div class="summary">
+            <p class="summary__row"><span>Subtotal</span><span data-subtotal></span></p>
+            <p class="summary__row summary__row--total"><span>Total</span><span data-cart-total></span></p>
+            <p class="summary__note">El envío se elige en el siguiente paso.</p>
+            <a class="add add--wide" href="#compra">Continuar con la compra</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="view checkout js-only" id="compra" data-view data-title="Compra" aria-labelledby="buy-t">
+        <a class="back" href="#carrito">Volver al carrito</a>
+        <h1 class="page-title" id="buy-t" tabindex="-1">Cierra tu compra</h1>
+        <form class="split" data-checkout>
+          <div class="options">
+            <fieldset>
+              <legend>Envío</legend>
+              <label class="option"><input type="radio" name="envio" value="0" checked /><span>Estándar, 2 a 4 días</span><b>Gratis</b></label>
+              <label class="option"><input type="radio" name="envio" value="12900" /><span>Exprés, al día siguiente</span><b>$ 12.900</b></label>
+            </fieldset>
+            <fieldset>
+              <legend>Pago</legend>
+              <label class="option"><input type="radio" name="pago" value="tarjeta" checked /><span>Tarjeta</span></label>
+              <label class="option"><input type="radio" name="pago" value="entrega" /><span>Contra entrega</span></label>
+            </fieldset>
+            <p class="summary__note">Esta demo no pide nombre, dirección ni tarjeta. En tu tienda, ese paso iría aquí.</p>
+          </div>
+          <div class="summary">
+            <p class="summary__row"><span data-items></span><span data-buy-subtotal></span></p>
+            <p class="summary__row"><span>Envío</span><span data-shipping></span></p>
+            <p class="summary__row summary__row--total"><span>Total</span><output data-total></output></p>
+            <button class="add add--wide" type="submit">Confirmar compra simulada</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="view done js-only" id="listo" data-view data-title="Compra simulada" aria-labelledby="done-t">
+        <h1 class="page-title" id="done-t" tabindex="-1">Compra simulada.<br />Así de fácil.</h1>
+        <p class="done__text">No se ha cobrado ni enviado nada, y no guardamos ningún dato tuyo. Total de la simulación: <strong data-done-total></strong>.</p>
+        <p class="done__actions">
+          <a class="add" href="/#contacto">Quiero una web así</a>
+          <a class="back" href="#catalogo">Seguir explorando</a>
+        </p>
+      </section>
+
+      <p class="nojs">El carrito y la compra simulada necesitan JavaScript.</p>
+    </main>
+
+    <footer class="foot">
+      <p class="foot__logo">Pulso</p>
+      <p>Marca, productos y precios ficticios. Demostración diseñada por <a href="/">Stiven Lux</a>.</p>
+    </footer>
+
+    <p class="toast" role="status" data-toast><span data-toast-text></span></p>
+  </body>
+</html>

@@ -14,17 +14,18 @@
 - Editorial de lujo, minimalista, moderna y atrevida. Mucho espacio negativo y tipografía a gran escala.
 - **Color:** negro `#000`, blanco `#FFF` y azul eléctrico `#2340FF` como acento selectivo (solo en acciones y
   señales: CTA final, relleno de botones al pasar, línea de progreso, hover de servicios).
-- **Tipografía:** Instrument Serif (titulares) + Inter Tight (interfaz). JetBrains Mono solo dentro del concepto
-  tecnológico. Todas autoalojadas (Fontsource, licencia OFL).
-- **Mockups:** dispositivos grandes y superpuestos con perspectiva y sombras de estudio, construidos en HTML/CSS.
+- **Tipografía:** Instrument Serif (titulares) + Inter Tight (interfaz). Todas autoalojadas (Fontsource, licencia OFL).
+- **Mockups:** dispositivos grandes y superpuestos con perspectiva y sombras de estudio, construidos en HTML/CSS
+  con fotos propias generadas con IA (spec 003).
 - **Evitar:** gradientes decorativos, tarjetas repetitivas, iconos innecesarios, botones genéricos, plantillas.
 
 ## Estructura de la landing
 
 1. **Hero cinematográfico** — titular, texto breve, CTA a WhatsApp, CTA a proyectos y mockups que se ensamblan.
 2. **Filosofía** — declaración editorial que se ilumina palabra a palabra con el scroll y tres principios.
-3. **Portafolio conceptual** — Maison Aurèle (moda de lujo), Kairo Systems (tecnología), Halden (servicios
-   premium). Marcas ficticias, identificadas como conceptos. Sin clientes, testimonios ni resultados inventados.
+3. **Portafolio conceptual** — desde la spec 004: Esmalte Claro (odontología), Diecinueve Grados (aires acondicionados) y Pulso
+   (e-commerce de tecnología), con fotos propias generadas con IA y una demo navegable cada uno.
+   Marcas ficticias, identificadas como conceptos. Sin clientes, testimonios ni resultados inventados.
 4. **Servicios** — dirección de arte, diseño a medida, desarrollo premium, landings de lanzamiento, evolución.
 5. **Proceso** — estrategia, dirección visual, diseño, desarrollo y lanzamiento.
 6. **Cierre** — declaración de marca y CTA a WhatsApp.

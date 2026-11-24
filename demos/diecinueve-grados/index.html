@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Diecinueve Grados · Modelo de demostración de Stiven Lux</title>
+    <meta name="description" content="Web de aires acondicionados de demostración diseñada por Stiven Lux. Negocio ficticio: no presta servicios ni agenda visitas reales." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#24130c" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/demos/diecinueve-grados/grados.css" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+    <script type="module" src="/src/demos/diecinueve-grados/grados.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+
+    <aside class="demo" aria-label="Aviso de demostración">
+      <p>Modelo de demostración · negocio ficticio</p>
+      <p class="demo__links">
+        <a href="/#proyectos">Volver a Stiven Lux</a>
+        <a href="/#contacto">Quiero una web así</a>
+      </p>
+    </aside>
+
+    <header class="top">
+      <a class="top__logo" href="#inicio" aria-label="Diecinueve Grados, inicio">Diecinueve Grados</a>
+      <nav class="top__nav" aria-label="Principal">
+        <a class="top__link" href="#servicios">Servicios</a>
+        <a class="btn btn--small js-only" href="#visita">Agendar visita</a>
+      </nav>
+    </header>
+
+    <main id="contenido" tabindex="-1">
+      <section class="view is-on" id="inicio" data-view data-title="Inicio" aria-labelledby="home-t">
+        <div class="hero">
+          <p class="hero__temp" aria-hidden="true"><span data-temp>19</span>°</p>
+          <script>
+            document.querySelector('[data-temp]').textContent = '31';
+          </script>
+          <div class="hero__copy">
+            <h1 class="hero__title" id="home-t" tabindex="-1">Afuera, lo que sea. En casa, 19.</h1>
+            <div class="hero__side">
+              <p class="hero__lead">Limpieza, revisión e instalación de aires acondicionados. Tú eliges el día.</p>
+              <a class="btn js-only" href="#visita">Agendar visita</a>
+            </div>
+          </div>
+          <label class="dial js-only">
+            <span class="dial__label">Baja la temperatura</span>
+            <input type="range" min="19" max="31" value="31" step="1" dir="rtl" data-dial aria-valuetext="31 grados" />
+          </label>
+        </div>
+
+        <picture class="room">
+          <source type="image/avif" srcset="/media/conceptos/clima-hero-640.avif 640w, /media/conceptos/clima-hero-1000.avif 1000w, /media/conceptos/clima-hero-1376.avif 1376w" sizes="(min-width: 48em) 100vw, 170vw" />
+          <source type="image/webp" srcset="/media/conceptos/clima-hero-640.webp 640w, /media/conceptos/clima-hero-1000.webp 1000w, /media/conceptos/clima-hero-1376.webp 1376w" sizes="(min-width: 48em) 100vw, 170vw" />
+          <img src="/media/conceptos/clima-hero-1000.jpg" alt="Sala de paredes azul hielo con un aire acondicionado de pared y un sillón naranja" width="1376" height="768" loading="lazy" decoding="async" />
+        </picture>
+
+        <div class="visit">
+          <picture class="visit__photo">
+            <source type="image/avif" srcset="/media/conceptos/clima-manos-480.avif 480w, /media/conceptos/clima-manos-960.avif 960w" sizes="(min-width: 48em) 50vw, 100vw" />
+            <source type="image/webp" srcset="/media/conceptos/clima-manos-480.webp 480w, /media/conceptos/clima-manos-960.webp 960w" sizes="(min-width: 48em) 50vw, 100vw" />
+            <img src="/media/conceptos/clima-manos-960.jpg" alt="Manos con guantes lavando el filtro de un aire acondicionado" width="1024" height="1024" loading="lazy" decoding="async" />
+          </picture>
+          <div class="visit__copy">
+            <h2>Así es una visita</h2>
+            <ol class="visit__list">
+              <li>Revisamos el equipo contigo y te decimos qué vemos.</li>
+              <li>Acordamos el trabajo antes de abrir nada.</li>
+              <li>Dejamos el lugar limpio y el equipo funcionando a la vista.</li>
+            </ol>
+            <a class="more" href="#servicios">Ver servicios</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="servicios" data-view data-title="Servicios" aria-labelledby="serv-t">
+        <h1 class="page__title page__title--in" id="serv-t" tabindex="-1">Servicios</h1>
+        <ul class="services">
+          <include src="demos/grados-service.html" id="revision" name="Revisión" text="No enfría, gotea o suena raro: miramos qué pasa y te lo explicamos."></include>
+          <include src="demos/grados-service.html" id="limpieza" name="Limpieza" text="Filtros, serpentín y bandeja, para que el aire vuelva a pasar libre."></include>
+          <include src="demos/grados-service.html" id="traslado" name="Traslado" text="Desmontamos el equipo, lo movemos y lo dejamos puesto en su lugar nuevo."></include>
+          <include src="demos/grados-service.html" id="instalacion" name="Instalación" text="Elegimos contigo la pared, pasamos la tubería y probamos el equipo."></include>
+        </ul>
+      </section>
+
+      <section class="view page js-only" id="visita" data-view data-step="service" data-title="Elige el servicio" aria-labelledby="s1-t">
+        <p class="step__n">Paso 1 de 3</p>
+        <h1 class="page__title" id="s1-t" tabindex="-1">¿Qué necesita tu aire?</h1>
+        <form data-form="service" novalidate>
+          <fieldset class="options" aria-labelledby="s1-t">
+            <include src="demos/grados-option.html" id="revision" name="Revisión" hint="No enfría, gotea o suena"></include>
+            <include src="demos/grados-option.html" id="limpieza" name="Limpieza" hint="Puesta a punto"></include>
+            <include src="demos/grados-option.html" id="traslado" name="Traslado" hint="Cambia de pared o de casa"></include>
+            <include src="demos/grados-option.html" id="instalacion" name="Instalación" hint="Equipo nuevo"></include>
+          </fieldset>
+          <p class="error" role="alert"></p>
+          <div class="step__nav"><a class="more" href="#inicio">Cancelar</a><button class="btn" type="submit">Continuar</button></div>
+        </form>
+      </section>
+
+      <section class="view page js-only" id="visita-fecha" data-view data-step="date" data-title="Elige el día" aria-labelledby="s2-t">
+        <p class="step__n">Paso 2 de 3</p>
+        <h1 class="page__title" id="s2-t" tabindex="-1">¿Qué día vamos?</h1>
+        <form data-form="date" novalidate>
+          <p class="step__hint">Disponibilidad simulada, de lunes a sábado.</p>
+          <fieldset class="days" data-days aria-labelledby="s2-t"></fieldset>
+          <p class="error" role="alert"></p>
+          <div class="step__nav"><a class="more" href="#visita">Atrás</a><button class="btn" type="submit">Continuar</button></div>
+        </form>
+      </section>
+
+      <section class="view page js-only" id="visita-resumen" data-view data-step="review" data-title="Revisa tu visita" aria-labelledby="s3-t">
+        <p class="step__n">Paso 3 de 3</p>
+        <h1 class="page__title" id="s3-t" tabindex="-1">¿La agendamos?</h1>
+        <form data-form="review" novalidate>
+          <dl class="review">
+            <div><dt>Servicio</dt><dd data-r="service"></dd><dd><a href="#visita" aria-label="Cambiar servicio">Cambiar</a></dd></div>
+            <div><dt>Día</dt><dd data-r="date"></dd><dd><a href="#visita-fecha" aria-label="Cambiar día">Cambiar</a></dd></div>
+          </dl>
+          <p class="step__hint">Esta demo no pide nombre, teléfono ni dirección. En tu web, ese paso iría aquí.</p>
+          <div class="step__nav"><a class="more" href="#visita-fecha">Atrás</a><button class="btn" type="submit">Confirmar visita simulada</button></div>
+        </form>
+      </section>
+
+      <section class="view done js-only" id="listo" data-view data-title="Visita simulada" aria-labelledby="done-t">
+        <h1 class="page__title" id="done-t" tabindex="-1">Visita simulada.<br />Ya refresca.</h1>
+        <p class="done__text"><strong data-done></strong> No se ha agendado nada y no guardamos ningún dato tuyo.</p>
+        <p class="done__actions">
+          <a class="btn" href="/#contacto">Quiero una web así</a>
+          <a class="more" href="#inicio">Volver al inicio</a>
+        </p>
+      </section>
+
+      <p class="nojs">La visita simulada necesita JavaScript.</p>
+    </main>
+
+    <footer class="foot">
+      <p class="foot__logo">Diecinueve Grados</p>
+      <p>Marca y servicios ficticios; fotos generadas con IA. Demostración diseñada por <a href="/">Stiven Lux</a>.</p>
+    </footer>
+  </body>
+</html>

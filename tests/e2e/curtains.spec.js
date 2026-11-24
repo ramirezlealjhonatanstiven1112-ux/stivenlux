@@ -341,7 +341,10 @@ for (const density of DENSITIES) {
         const c = await scrollToCurtain(page, id, target);
         const f = await frame(page, id);
         expect(f.ft, `${id} con c = ${c}: hay franja`).toBeGreaterThan(4);
-        const band = await pixelBand(page, { from: f.rect.top - 1, to: f.rect.top + f.ft - 1, ref: prev === 'light' ? 255 : 0 });
+        // La franja se mira hasta 1 px CSS + 1 px de dispositivo antes del plano. Sin ese margen el test es
+        // intermitente también en la base (reviewer de la 003: base 8/30 y actual 5/30 fallos; con margen 0/30).
+        // Se sospecha del encaje en píxeles enteros del ::before a DPR 1,25, pero la causa no está probada.
+        const band = await pixelBand(page, { from: f.rect.top - 1, to: f.rect.top + f.ft - 1 - 1 / options.deviceScaleFactor, ref: prev === 'light' ? 255 : 0 });
         expect(band.worst, `${id} con c = ${c}: franja uniforme (peor píxel ${JSON.stringify(band.at)})`).toBeLessThanOrEqual(2);
       }
     }

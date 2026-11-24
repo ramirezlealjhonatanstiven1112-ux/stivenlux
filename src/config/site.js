@@ -10,13 +10,13 @@ export const site = {
 
   whatsapp: {
     /*
-     * PENDIENTE: número oficial de WhatsApp de Stiven Lux.
+     * Número oficial de WhatsApp de Stiven Lux.
      * Formato internacional: código de país + número, de 8 a 15 dígitos. Se admiten espacios,
      * guiones, paréntesis y "+" (se eliminan); cualquier otro carácter lo invalida.
      * Mientras esté vacío, todos los CTA de WhatsApp llevan a la sección #contacto
      * y el build muestra un aviso (también si el número no es válido).
      */
-    number: '',
+    number: '573002207526',
     message: 'Hola Stiven Lux, quiero iniciar un proyecto web.',
   },
 

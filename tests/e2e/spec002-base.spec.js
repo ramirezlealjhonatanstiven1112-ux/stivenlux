@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { animationsDone, heroEntranceDone, open, scrollToY } from './support/motion.js';
-import { clsRoute, fingerprintDiff, styleFingerprint, tabOrder } from './support/pointer.js';
+import { FINGERPRINT_PATH_FN, clsRoute, fingerprintDiff, styleFingerprint, tabOrder } from './support/pointer.js';
 
 // Spec 002 · comparaciones con la base 0f6b12d (spec 001 implementada): huella de estilos en reposo en táctil
 // (RF-16, RF-20), hovers y página sin JS en escritorio (RF-17), cursor del sistema (RF-5), orden de tabulación
@@ -75,12 +75,41 @@ function expectSameFingerprint(name, baseFp, now) {
   });
 }
 
+/* La spec 003 sustituye a propósito las pantallas y los textos de los conceptos (subárboles) y, con ellos, las
+   alturas y los colores de unos pocos contenedores (solo el nodo, no sus hijos). La huella de la 002 sigue
+   vigilando las capas, los dispositivos y el resto de la página. */
+const SPEC003_REPLACED = {
+  subtrees: ['.scr', '.device__url', '.work__head', '.project__info'],
+  nodes: ['html', 'body', 'main', '.work', '.project', '.project__stage'],
+  // Entre 768 y 864 px la 003 desplaza el escenario del hero (RF-19)
+  shifted: { min: 768, max: 864, nodes: ['.hero__stage'] },
+};
+
+async function replacedBySpec003(page) {
+  return page.evaluate(
+    ({ pathSrc, subtrees, nodes, shifted }) => {
+      const path = new Function(`return ${pathSrc}`)();
+      return {
+        prefixes: subtrees.flatMap((sel) => [...document.querySelectorAll(sel)].map(path)),
+        exact: [...nodes, ...(window.innerWidth >= shifted.min && window.innerWidth <= shifted.max ? shifted.nodes : [])].flatMap((sel) => [...document.querySelectorAll(sel)].map(path)),
+      };
+    },
+    { pathSrc: FINGERPRINT_PATH_FN, ...SPEC003_REPLACED },
+  );
+}
+
+function withoutReplaced(fp, { prefixes, exact }) {
+  const inside = (k) => exact.includes(k.replace(/::.*$/, '')) || prefixes.some((p) => k === p || k.startsWith(`${p}>`) || k.startsWith(`${p}::`));
+  return Object.fromEntries(Object.entries(fp).filter(([k]) => !inside(k)));
+}
+
 async function fingerprintCase(page, key, js, fine) {
   await atRest(page, js);
   await expectFinePointer(page, fine);
   const fp = await styleFingerprint(page);
   if (record(`huella-${key}`, fp)) return;
-  expectSameFingerprint(key, base('huella')[key], fp);
+  const replaced = await replacedBySpec003(page);
+  expectSameFingerprint(key, withoutReplaced(base('huella')[key], replaced), withoutReplaced(fp, replaced));
 }
 
 /* ---------- RF-16, RF-20 · huella de estilos en reposo en táctil (con y sin JS) ---------- */
@@ -227,7 +256,8 @@ test('RF-19 · orden de tabulación = base', async ({ page }, testInfo) => {
   const order = await tabOrder(page);
   expect(errors).toEqual([]);
   if (record(`tab-${testInfo.project.name}`, order)) return;
-  expect(order).toEqual(base('tabOrder')[testInfo.project.name]);
+  // La spec 004 añade a propósito un enlace «Explorar demo» por proyecto: lo demás sigue igual que la base
+  expect(order.filter((el) => !el.label.startsWith('Explorar demo'))).toEqual(base('tabOrder')[testInfo.project.name]);
 });
 
 /* ---------- RNF estabilidad · CLS del recorrido ---------- */
@@ -246,6 +276,6 @@ test('RNF estabilidad · CLS del recorrido ≤ base', async ({ context }, testIn
   }
   if (record(`cls-${profile}`, { max: Math.max(...runs.map((r) => r.cls)), runs })) return;
   const baseCls = base('cls')[profile];
-  expect(runs[0].visited, 'mismo recorrido que la base').toEqual(baseCls.runs[0].visited);
+  expect(runs[0].visited.filter((label) => label !== 'Explorar demo'), 'mismo recorrido que la base').toEqual(baseCls.runs[0].visited);
   expect(runs[0].cls, `CLS (desplazamientos: ${JSON.stringify(runs[0].shifts)})`).toBeLessThanOrEqual(baseCls.max + 1e-6);
 });

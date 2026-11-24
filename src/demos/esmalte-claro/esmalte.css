@@ -1,0 +1,774 @@
+/* Demo Esmalte Claro (spec 004): blanco y cobalto. Independiente de la portada y de las otras demos. */
+@font-face {
+  font-family: 'Inter Tight Variable';
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../../../node_modules/@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root {
+  --ink: #0f1f5c;
+  --cobalt: #1746d1;
+  --soft: #505b84;
+  --mist: #eef2fa;
+  --rule: #cfd8ee;
+  --gutter: clamp(1.25rem, 5vw, 5.5rem);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --top-h: 4.75rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding: calc(var(--top-h) + 1rem) 0 7rem;
+  text-size-adjust: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font: 400 1.0625rem/1.55 'Inter Tight Variable', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+p,
+ul,
+dl,
+dd,
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+.band__title {
+  color: var(--cobalt);
+  font-weight: 340;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+picture {
+  display: block;
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.3em;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+a,
+button,
+label {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+main:focus,
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.skip {
+  position: fixed;
+  z-index: 30;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--cobalt);
+  color: #fff;
+  transform: translateY(-200%);
+}
+
+.skip:focus {
+  transform: none;
+}
+
+html:not(.js) .js-only,
+.js .nojs,
+.js .view:not(.is-on) {
+  display: none;
+}
+
+/* ── Aviso y cabecera ───────────────────────────────────── */
+.demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 1.5rem;
+  padding: 0 var(--gutter);
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.demo p {
+  padding: 0.5rem 0;
+}
+
+.demo__links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.demo a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+}
+
+.demo :focus-visible,
+.band :focus-visible,
+.done :focus-visible {
+  outline-color: #fff;
+}
+
+.top {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: var(--top-h);
+  padding: 0 var(--gutter);
+  background: #fff;
+}
+
+.top__logo {
+  color: var(--cobalt);
+  font-size: 1.375rem;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.top__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 2.25rem);
+}
+
+.top__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ── Piezas ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 0 1.75rem;
+  border: 1px solid var(--cobalt);
+  border-radius: 0.5rem;
+  background: var(--cobalt);
+  color: #fff;
+  font-weight: 560;
+  text-decoration: none;
+}
+
+.btn--small {
+  min-height: 2.75rem;
+  padding: 0 1.15rem;
+}
+
+.btn--line {
+  min-height: 2.75rem;
+  background: none;
+  color: var(--cobalt);
+}
+
+.btn--white {
+  border-color: #fff;
+  background: #fff;
+  color: var(--cobalt);
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: #fff;
+  }
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: 560;
+}
+
+/* ── Inicio ─────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: clamp(32rem, calc(100svh - 7.75rem), 58rem);
+  overflow: hidden;
+  background: var(--mist);
+}
+
+.hero__photo {
+  position: absolute;
+  inset: 0;
+}
+
+.hero__photo img {
+  object-position: 100% 70%;
+}
+
+.hero__copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.75rem;
+  width: 60%;
+  height: 100%;
+  padding: 0 0 4vh var(--gutter);
+}
+
+.hero__title {
+  font-size: clamp(3rem, 7.4vw, 8rem);
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+
+.hero__lead {
+  max-width: 30ch;
+  font-size: clamp(1.125rem, 1.5vw, 1.4375rem);
+  line-height: 1.4;
+}
+
+.listen,
+.calm {
+  display: grid;
+  align-items: center;
+}
+
+.listen {
+  grid-template-columns: 1fr 1fr;
+}
+
+.listen__photo {
+  aspect-ratio: 1;
+}
+
+.listen__copy,
+.calm__copy {
+  display: grid;
+  justify-items: start;
+  gap: 1.5rem;
+  padding: clamp(3rem, 6vw, 7rem) var(--gutter);
+}
+
+.listen h2,
+.calm h2 {
+  font-size: clamp(2.25rem, 4.4vw, 4.75rem);
+}
+
+.listen p,
+.calm p {
+  max-width: 38ch;
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+}
+
+.calm {
+  grid-template-columns: 5fr 7fr;
+  background: var(--mist);
+}
+
+.calm__photo {
+  height: clamp(26rem, 48vw, 46rem);
+}
+
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(3.5rem, 7vw, 7rem) var(--gutter);
+  background: var(--cobalt);
+}
+
+.band__title {
+  color: #fff;
+  font-size: clamp(2.5rem, 5.6vw, 6rem);
+}
+
+/* ── Tratamientos ───────────────────────────────────────── */
+.page {
+  padding: clamp(2rem, 5vw, 5rem) var(--gutter) clamp(4rem, 8vw, 8rem);
+}
+
+.page__title {
+  margin-bottom: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(2.75rem, 7vw, 7rem);
+  letter-spacing: -0.05em;
+}
+
+.treat {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) 6rem auto;
+  align-items: center;
+  gap: 1rem 2.5rem;
+  padding: clamp(1.5rem, 2.4vw, 2.25rem) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.treat:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.treat__name {
+  font-size: clamp(1.875rem, 3.2vw, 3.25rem);
+}
+
+.treat__time {
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Cita ───────────────────────────────────────────────── */
+.step__n {
+  margin-bottom: 0.75rem;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.step form {
+  max-width: 62rem;
+}
+
+.options {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.option,
+.pick {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.25rem;
+  padding: 0 1.5rem;
+  font-size: 1.25rem;
+}
+
+.option small {
+  color: var(--soft);
+  font-size: 1rem;
+}
+
+.option input,
+.pick input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.option:has(:checked),
+.pick:has(:checked) {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+  color: #fff;
+}
+
+.option:has(:checked) small {
+  color: inherit;
+}
+
+.option:has(:focus-visible),
+.pick:has(:focus-visible) {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .option:hover,
+  .pick:not(:has(:disabled)):hover {
+    border-color: var(--cobalt);
+  }
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.pick {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  min-height: 8.5rem;
+  line-height: 1.2;
+}
+
+.times .pick {
+  min-height: 5rem;
+}
+
+.pick__num {
+  font-size: 2.5rem;
+  font-weight: 340;
+  letter-spacing: -0.04em;
+}
+
+.pick__hour {
+  font-size: 1.375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pick__busy {
+  font-size: 0.875rem;
+}
+
+.pick:has(:disabled) {
+  border-color: transparent;
+  background: var(--mist);
+  color: var(--soft);
+  cursor: not-allowed;
+}
+
+.pick:has(:disabled) .pick__hour {
+  text-decoration: line-through;
+}
+
+.step__hint {
+  margin-bottom: 1.5rem;
+  color: var(--soft);
+}
+
+.error {
+  min-height: 1.6em;
+  margin-top: 1rem;
+  color: #b3192f;
+  font-weight: 560;
+}
+
+.step__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.review {
+  margin-bottom: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.review div {
+  display: grid;
+  grid-template-columns: 9rem 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.review dt {
+  color: var(--soft);
+}
+
+.review dd {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  letter-spacing: -0.02em;
+}
+
+.review dd:last-child {
+  font-size: 1rem;
+}
+
+.review a {
+  display: inline-block;
+  padding: 0.5rem 0;
+}
+
+.done {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 74svh;
+  padding: clamp(3rem, 6vw, 6rem) var(--gutter);
+  background: var(--cobalt);
+  color: #fff;
+}
+
+.done h1 {
+  color: #fff;
+}
+
+.done__text {
+  max-width: 42ch;
+  font-size: 1.25rem;
+}
+
+.done__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-top: 2rem;
+}
+
+/* ── Pie ────────────────────────────────────────────────── */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding: 2.5rem var(--gutter) calc(2rem + env(safe-area-inset-bottom));
+  color: var(--soft);
+  font-size: 0.9375rem;
+}
+
+.foot__logo {
+  color: var(--cobalt);
+  font-size: 1.375rem;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+}
+
+.nojs {
+  padding: 2rem var(--gutter);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .view.is-on {
+    animation: enter 0.45s var(--ease) both;
+  }
+
+  .btn,
+  .option,
+  .pick {
+    transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .option:has(:checked),
+  .pick:has(:checked) {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* ── Móvil: texto primero, pasos con el botón al alcance ── */
+@media (max-width: 47.99em) {
+  .demo {
+    padding-bottom: 0.35rem;
+  }
+
+  .demo p {
+    padding: 0.35rem 0 0;
+  }
+
+  .demo__links {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .top__logo {
+    font-size: 1.1875rem;
+  }
+
+  .top__nav {
+    gap: 0.75rem;
+  }
+
+  .top__link {
+    font-size: 0.9375rem;
+  }
+
+  .top .btn {
+    padding: 0 0.85rem;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column-reverse;
+    height: auto;
+    background: none;
+  }
+
+  .hero__photo {
+    position: static;
+    height: min(46svh, 24rem);
+  }
+
+  .hero__photo img {
+    object-position: 88% 70%;
+  }
+
+  .hero__copy {
+    width: auto;
+    height: auto;
+    gap: 1.25rem;
+    padding: 1.75rem var(--gutter) 2.25rem;
+  }
+
+  .hero__title {
+    font-size: clamp(2.75rem, 14.2vw, 4.5rem);
+  }
+
+  .listen,
+  .calm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .listen__copy,
+  .calm__copy {
+    gap: 1rem;
+  }
+
+  .calm__photo {
+    height: 22rem;
+  }
+
+  .treat {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem 1rem;
+  }
+
+  .treat__text,
+  .treat__name {
+    grid-column: 1 / -1;
+  }
+
+  .days,
+  .times {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pick {
+    min-height: 6.5rem;
+  }
+
+  .pick__num {
+    font-size: 2rem;
+  }
+
+  .option {
+    padding: 0 1.15rem;
+  }
+
+  .page__title {
+    margin-bottom: 1.75rem;
+  }
+
+  .step {
+    padding-bottom: 2rem;
+  }
+
+  .step__nav {
+    position: sticky;
+    bottom: 0;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0.85rem var(--gutter) calc(0.85rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--rule);
+    background: #fff;
+  }
+
+  .review div {
+    grid-template-columns: 1fr auto;
+    gap: 0 1rem;
+  }
+
+  .review dt {
+    grid-column: 1 / -1;
+  }
+}
+
+/* En pantallas muy estrechas, Tratamientos queda a un toque desde el inicio */
+@media (max-width: 23em) {
+  .top__link {
+    display: none;
+  }
+}
+
+/* El salto nativo al ancla acaba arriba del todo, no bajo la cabecera */
+.js .view {
+  scroll-margin-top: 50rem;
+}

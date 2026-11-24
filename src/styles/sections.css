@@ -106,8 +106,9 @@
   clip-path: inset(calc((1 - var(--e, 1)) * 7%) calc((1 - var(--e, 1)) * 5%));
 }
 
-.project--tech .project__stage { --stage-bg: #c5cad1; }
-.project--services .project__stage { --stage-bg: #0c1813; }
+.project--dental .project__stage { --stage-bg: #0f1f5c; }
+.project--climate .project__stage { --stage-bg: #a9cfe2; }
+.project--store .project__stage { --stage-bg: #d6d8cf; }
 
 .project__layer {
   position: absolute;
@@ -201,6 +202,12 @@
 
 .project__spec dt {
   color: var(--grey-on-white);
+}
+
+.project__demo {
+  grid-column: -2 / -1;
+  justify-self: start;
+  margin-top: 0.75rem;
 }
 
 .swatches {

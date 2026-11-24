@@ -25,6 +25,8 @@ async function ready(page, js) {
       window.addEventListener('click', (e) => window.__clicks.push(e.target.closest('a, button, .service')), true);
     });
   } else {
+    // Spec 004: sin JS, «Explorar demo» saldría de la portada; un 204 deja la página donde está
+    await page.route('**/demos/**', (route) => route.fulfill({ status: 204 }));
     await page.goto('/');
     await page.waitForLoadState('load');
     await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded');
@@ -55,6 +57,8 @@ async function tapEach(page, js) {
   const targets = page.locator(TARGETS);
   const count = await targets.count();
   let tapped = 0;
+  const requested = [];
+  page.on('request', (r) => requested.push(`/${r.url().split('/').slice(3).join('/')}`));
   for (let i = 0; i < count; i += 1) {
     const target = targets.nth(i);
     const info = await target.evaluate((el) => {
@@ -110,6 +114,7 @@ async function tapEach(page, js) {
       }
     } else if (info.href) {
       if (js) expect(await page.evaluate(() => window.__clicks.length), `${info.label}: un toque, un clic`).toBe(1);
+      else if (info.href.startsWith('/')) expect(requested, `${info.label}: un toque navega`).toContain(info.href);
       else expect(await page.evaluate(() => window.location.hash), `${info.label}: un toque navega`).toBe(info.href);
     }
     if (js) await page.evaluate(() => (window.__clicks = []));

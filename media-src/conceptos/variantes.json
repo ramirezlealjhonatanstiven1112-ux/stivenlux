@@ -1,0 +1,266 @@
+[
+ {
+  "variante": "barberia-barbero-320",
+  "avif": 16323,
+  "crf": 28,
+  "webp": 24630,
+  "q": 80,
+  "jpg": 27228
+ },
+ {
+  "variante": "barberia-barbero-480",
+  "avif": 28565,
+  "crf": 28,
+  "webp": 45108,
+  "q": 80,
+  "jpg": 50937
+ },
+ {
+  "variante": "barberia-barbero-800",
+  "avif": 54800,
+  "crf": 28,
+  "webp": 71926,
+  "q": 72,
+  "jpg": 107288
+ },
+ {
+  "variante": "barberia-hero-640",
+  "avif": 12769,
+  "crf": 28,
+  "webp": 20082,
+  "q": 80,
+  "jpg": 25312
+ },
+ {
+  "variante": "barberia-hero-1000",
+  "avif": 25896,
+  "crf": 28,
+  "webp": 41360,
+  "q": 80,
+  "jpg": 52240
+ },
+ {
+  "variante": "barberia-hero-1376",
+  "avif": 42911,
+  "crf": 28,
+  "webp": 69332,
+  "q": 80,
+  "jpg": 87502
+ },
+ {
+  "variante": "barberia-herramientas-400",
+  "avif": 14548,
+  "crf": 28,
+  "webp": 22654,
+  "q": 80,
+  "jpg": 25065
+ },
+ {
+  "variante": "barberia-herramientas-640",
+  "avif": 30650,
+  "crf": 28,
+  "webp": 49038,
+  "q": 80,
+  "jpg": 55497
+ },
+ {
+  "variante": "barberia-herramientas-800",
+  "avif": 41938,
+  "crf": 28,
+  "webp": 69834,
+  "q": 80,
+  "jpg": 79425
+ },
+ {
+  "variante": "restaurante-costillas-240",
+  "avif": 9725,
+  "crf": 28,
+  "webp": 13234,
+  "q": 80,
+  "jpg": 14313
+ },
+ {
+  "variante": "restaurante-costillas-360",
+  "avif": 18578,
+  "crf": 28,
+  "webp": 25836,
+  "q": 80,
+  "jpg": 28613
+ },
+ {
+  "variante": "restaurante-costillas-480",
+  "avif": 28996,
+  "crf": 28,
+  "webp": 40632,
+  "q": 80,
+  "jpg": 44973
+ },
+ {
+  "variante": "restaurante-hero-640",
+  "avif": 21703,
+  "crf": 28,
+  "webp": 29842,
+  "q": 80,
+  "jpg": 33856
+ },
+ {
+  "variante": "restaurante-hero-1000",
+  "avif": 42635,
+  "crf": 28,
+  "webp": 61192,
+  "q": 80,
+  "jpg": 70150
+ },
+ {
+  "variante": "restaurante-hero-1376",
+  "avif": 67118,
+  "crf": 28,
+  "webp": 78062,
+  "q": 72,
+  "jpg": 115330
+ },
+ {
+  "variante": "restaurante-postre-240",
+  "avif": 7898,
+  "crf": 28,
+  "webp": 10768,
+  "q": 80,
+  "jpg": 12220
+ },
+ {
+  "variante": "restaurante-postre-360",
+  "avif": 14583,
+  "crf": 28,
+  "webp": 20814,
+  "q": 80,
+  "jpg": 23878
+ },
+ {
+  "variante": "restaurante-postre-480",
+  "avif": 21746,
+  "crf": 28,
+  "webp": 31688,
+  "q": 80,
+  "jpg": 36611
+ },
+ {
+  "variante": "restaurante-trucha-240",
+  "avif": 11231,
+  "crf": 28,
+  "webp": 14508,
+  "q": 80,
+  "jpg": 15620
+ },
+ {
+  "variante": "restaurante-trucha-360",
+  "avif": 21750,
+  "crf": 28,
+  "webp": 28866,
+  "q": 80,
+  "jpg": 31555
+ },
+ {
+  "variante": "restaurante-trucha-480",
+  "avif": 33682,
+  "crf": 28,
+  "webp": 45296,
+  "q": 80,
+  "jpg": 49713
+ },
+ {
+  "variante": "tienda-audifonos-240",
+  "avif": 2613,
+  "crf": 28,
+  "webp": 3386,
+  "q": 80,
+  "jpg": 5281
+ },
+ {
+  "variante": "tienda-audifonos-360",
+  "avif": 3707,
+  "crf": 28,
+  "webp": 5474,
+  "q": 80,
+  "jpg": 8934
+ },
+ {
+  "variante": "tienda-audifonos-480",
+  "avif": 4723,
+  "crf": 28,
+  "webp": 7612,
+  "q": 80,
+  "jpg": 12925
+ },
+ {
+  "variante": "tienda-hero-640",
+  "avif": 3365,
+  "crf": 28,
+  "webp": 5384,
+  "q": 80,
+  "jpg": 9212
+ },
+ {
+  "variante": "tienda-hero-1000",
+  "avif": 7979,
+  "crf": 28,
+  "webp": 13118,
+  "q": 80,
+  "jpg": 20169
+ },
+ {
+  "variante": "tienda-hero-1376",
+  "avif": 14932,
+  "crf": 28,
+  "webp": 24600,
+  "q": 80,
+  "jpg": 36084
+ },
+ {
+  "variante": "tienda-parlante-240",
+  "avif": 1648,
+  "crf": 28,
+  "webp": 2854,
+  "q": 80,
+  "jpg": 3834
+ },
+ {
+  "variante": "tienda-parlante-360",
+  "avif": 4548,
+  "crf": 28,
+  "webp": 7776,
+  "q": 80,
+  "jpg": 9617
+ },
+ {
+  "variante": "tienda-parlante-480",
+  "avif": 9432,
+  "crf": 28,
+  "webp": 15262,
+  "q": 80,
+  "jpg": 18162
+ },
+ {
+  "variante": "tienda-reloj-240",
+  "avif": 1912,
+  "crf": 28,
+  "webp": 2658,
+  "q": 80,
+  "jpg": 4258
+ },
+ {
+  "variante": "tienda-reloj-360",
+  "avif": 2699,
+  "crf": 28,
+  "webp": 4288,
+  "q": 80,
+  "jpg": 7198
+ },
+ {
+  "variante": "tienda-reloj-480",
+  "avif": 3555,
+  "crf": 28,
+  "webp": 6028,
+  "q": 80,
+  "jpg": 10380
+ }
+]

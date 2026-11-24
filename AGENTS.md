@@ -29,8 +29,14 @@ Landing oficial de Stiven Lux, estudio de diseño y desarrollo web premium («No
 - Al abrir sesión: `/coordinator` (continúa donde quedó) o `/coordinator <idea>` (con @planner, @implementer, @reviewer). Fase a fase: `/sdd-*`. Cambio pequeño: `/feature`.
 - Nunca pases de fase sin aprobación explícita del usuario.
 
+### Modo ligero (aprobado por el usuario, 2026-11-24; manda sobre lo anterior si choca)
+- Un solo documento corto por spec, con máximo 5 tareas. Conversación nueva por demo o tema.
+- Pruebas solo de lo tocado; `npm run check` una vez, antes de publicar.
+- Un @reviewer al final de la spec. El usuario revisa en pantalla cada entrega antes de la siguiente.
+- Si una parte va a reemplazarse, no se pule.
+
 ## Límites
-- ✅ Siempre: `npm run check` antes de dar algo por terminado; actualizar `MEMORY.md` al terminar cada tarea.
+- ✅ Siempre: `npm run check` antes de publicar (pruebas de lo tocado en cada entrega); actualizar `MEMORY.md` al terminar cada tarea.
 - ⚠️ Pregunta antes: dependencias nuevas, archivos fuera de la spec, cambios de identidad visual, gastar créditos de Higgsfield.
 - 🚫 Nunca: commit o push sin autorización, secretos en el repo, editar skills de terceros en `.claude/skills/`, datos inventados.
 

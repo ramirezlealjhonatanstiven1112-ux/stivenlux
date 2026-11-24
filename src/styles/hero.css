@@ -257,6 +257,13 @@
   }
 }
 
+/* Tablet estrecha: el texto no cae sobre los mockups (spec 003, RF-19) */
+@media (min-width: 48em) and (max-width: 54em) {
+  .hero__stage {
+    right: -26vw;
+  }
+}
+
 /* ── Móvil: composición propia, no un recorte del escritorio ─
    Texto primero, después una escena vertical con dos dispositivos. */
 @media (max-width: 47.99em) {

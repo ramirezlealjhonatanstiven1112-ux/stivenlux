@@ -11,7 +11,6 @@
 
   --serif: 'Instrument Serif', 'Times New Roman', serif;
   --sans: 'Inter Tight Variable', 'Helvetica Neue', Arial, sans-serif;
-  --mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   --gutter: clamp(1.25rem, 4vw, 4rem);
   --max: 1600px;

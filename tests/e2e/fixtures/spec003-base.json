@@ -1,0 +1,5 @@
+{
+ "_origen": "Base de la spec 003: commit 18cd88b. Peso: build de npm run check del 2026-11-08 sobre ese árbol. CLS: medido por el reviewer sobre 18cd88b en la validación (2026-11-24), idéntico al heredado de la spec 002.",
+ "peso": { "js": 5555, "css": 11653 },
+ "cls": { "escritorio": 0.000114, "movil": 0.00013 }
+}

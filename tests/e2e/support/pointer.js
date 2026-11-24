@@ -11,7 +11,7 @@ export const FINGERPRINT_EXCLUDED = [];
 /* Ruta estable de un elemento: etiqueta e índice entre los hijos de su padre, desde <html>. No usa clases
    (cambian con el script y con el estado), así que la misma ruta señala el mismo nodo con y sin JS. Se pasa
    como texto a page.evaluate (funciona también sin JS). */
-const PATH_FN = `(el) => {
+export const FINGERPRINT_PATH_FN = `(el) => {
   const parts = [];
   for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
     parts.push(n.tagName.toLowerCase() + [...n.parentElement.children].indexOf(n));
@@ -59,7 +59,7 @@ export async function styleFingerprint(page, root = null) {
       }
       return out;
     },
-    { pathSrc: PATH_FN, excluded: FINGERPRINT_EXCLUDED, rootSel: root },
+    { pathSrc: FINGERPRINT_PATH_FN, excluded: FINGERPRINT_EXCLUDED, rootSel: root },
   );
 }
 
@@ -83,7 +83,7 @@ export async function tabOrder(page) {
       if (!el || el === document.body || el === document.documentElement) return null;
       const label = (el.getAttribute('aria-label') || el.textContent).trim().replace(/\s+/g, ' ');
       return { label, path: path(el) };
-    }, PATH_FN);
+    }, FINGERPRINT_PATH_FN);
     if (!item || order.some((o) => o.path === item.path)) break;
     order.push(item);
   }

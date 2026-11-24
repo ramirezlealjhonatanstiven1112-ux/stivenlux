@@ -55,5 +55,15 @@ export default defineConfig({
   build: {
     target: 'es2020',
     cssMinify: true,
+    // Sin el polyfill, las páginas no comparten ningún trozo de JS: la portada no carga código de las demos
+    modulePreload: { polyfill: false },
+    rollupOptions: {
+      input: {
+        main: resolve(root, 'index.html'),
+        pulso: resolve(root, 'demos/pulso/index.html'),
+        esmalte: resolve(root, 'demos/esmalte-claro/index.html'),
+        grados: resolve(root, 'demos/diecinueve-grados/index.html'),
+      },
+    },
   },
 });

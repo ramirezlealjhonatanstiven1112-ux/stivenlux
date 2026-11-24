@@ -1,0 +1,11 @@
+<li class="card" data-category="{{category}}">
+  <a class="card__link" href="#{{id}}">
+    <span class="card__photo"><include src="demos/pulso-photo.html" photo="{{photo}}" w1="{{w1}}" w2="{{w2}}" w="{{w}}" h="{{h}}" alt="" sizes="(min-width: 48em) {{vw}}vw, {{vwm}}vw" loading="lazy"></include></span>
+    <span class="card__name">{{name}}</span>
+    <span class="card__kind">{{kind}}</span>
+  </a>
+  <div class="card__buy">
+    <span class="price">{{label}}</span>
+    <button class="add add--small" type="button" data-add="{{id}}" aria-label="Agregar {{name}} al carrito"><span data-add-label>Agregar</span></button>
+  </div>
+</li>

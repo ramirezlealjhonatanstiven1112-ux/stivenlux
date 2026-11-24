@@ -1,0 +1,17 @@
+<section class="view product" id="{{id}}" data-view data-price="{{price}}" data-name="{{name}}" data-photo="{{photo}}" data-thumb="{{w1}}" aria-labelledby="{{id}}-t">
+  <div class="product__photo"><include src="demos/pulso-photo.html" photo="{{photo}}" w1="{{w1}}" w2="{{w2}}" w="{{w}}" h="{{h}}" alt="{{alt}}" sizes="(min-width: 48em) {{vw}}vw, {{vwm}}vw" loading="lazy"></include></div>
+  <div class="product__copy">
+    <a class="back" href="#catalogo">Volver al catálogo</a>
+    <h1 class="product__title" id="{{id}}-t" tabindex="-1">{{name}}</h1>
+    <p class="product__lead">{{lead}}</p>
+    <dl class="facts">
+      <div><dt>{{d1}}</dt><dd>{{v1}}</dd></div>
+      <div><dt>{{d2}}</dt><dd>{{v2}}</dd></div>
+      <div><dt>{{d3}}</dt><dd>{{v3}}</dd></div>
+    </dl>
+    <div class="product__buy">
+      <span class="price price--big">{{label}}</span>
+      <button class="add" type="button" data-add="{{id}}" aria-label="Agregar al carrito: {{name}}"><span data-add-label>Agregar al carrito</span></button>
+    </div>
+  </div>
+</section>

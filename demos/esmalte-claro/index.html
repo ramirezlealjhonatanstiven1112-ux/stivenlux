@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Esmalte Claro · Modelo de demostración de Stiven Lux</title>
+    <meta name="description" content="Web de odontología de demostración diseñada por Stiven Lux. Negocio ficticio: no presta servicios ni agenda citas reales." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0f1f5c" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/demos/esmalte-claro/esmalte.css" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+    <script type="module" src="/src/demos/esmalte-claro/esmalte.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+
+    <aside class="demo" aria-label="Aviso de demostración">
+      <p>Modelo de demostración · negocio ficticio</p>
+      <p class="demo__links">
+        <a href="/#proyectos">Volver a Stiven Lux</a>
+        <a href="/#contacto">Quiero una web así</a>
+      </p>
+    </aside>
+
+    <header class="top">
+      <a class="top__logo" href="#inicio">Esmalte Claro</a>
+      <nav class="top__nav" aria-label="Principal">
+        <a class="top__link" href="#tratamientos">Tratamientos</a>
+        <a class="btn btn--small js-only" href="#cita">Agendar cita</a>
+      </nav>
+    </header>
+
+    <main id="contenido" tabindex="-1">
+      <section class="view is-on" id="inicio" data-view data-title="Inicio" aria-labelledby="home-t">
+        <div class="hero">
+          <picture class="hero__photo">
+            <source type="image/avif" srcset="/media/conceptos/odonto-hero-640.avif 640w, /media/conceptos/odonto-hero-1000.avif 1000w, /media/conceptos/odonto-hero-1376.avif 1376w" sizes="(min-width: 48em) 100vw, 190vw" />
+            <source type="image/webp" srcset="/media/conceptos/odonto-hero-640.webp 640w, /media/conceptos/odonto-hero-1000.webp 1000w, /media/conceptos/odonto-hero-1376.webp 1376w" sizes="(min-width: 48em) 100vw, 190vw" />
+            <img src="/media/conceptos/odonto-hero-1000.jpg" alt="Consultorio blanco y luminoso con un sillón dental azul cobalto junto a la ventana" width="1376" height="768" fetchpriority="high" />
+          </picture>
+          <div class="hero__copy">
+            <h1 class="hero__title" id="home-t" tabindex="-1">Todo claro,<br />desde la cita.</h1>
+            <p class="hero__lead">Elige tratamiento, día y hora. Sin llamadas y sin letra pequeña.</p>
+            <a class="btn js-only" href="#cita">Agendar cita</a>
+          </div>
+        </div>
+
+        <div class="listen">
+          <div class="listen__photo"><include src="demos/esmalte-photo.html" photo="retrato" alt="Persona de camisa azul con una sonrisa tranquila" sizes="(min-width: 48em) 50vw, 100vw"></include></div>
+          <div class="listen__copy">
+            <h2>Primero te escuchamos. Después te explicamos.</h2>
+            <p>Una visita empieza con tus preguntas. Sales sabiendo qué opciones hay, cuánto dura cada una y qué sigue.</p>
+            <a class="more" href="#tratamientos">Ver tratamientos</a>
+          </div>
+        </div>
+
+        <div class="calm">
+          <div class="calm__copy">
+            <h2>Un lugar sin prisa.</h2>
+            <p>Luz natural, pocas cosas a la vista y una sola persona a la vez. Así se siente una cita que no da pereza.</p>
+          </div>
+          <div class="calm__photo"><include src="demos/esmalte-photo.html" photo="bodegon" alt="Cepillo azul cobalto en un vaso de porcelana junto a un vaso de agua" sizes="(min-width: 48em) 58vw, 100vw"></include></div>
+        </div>
+
+        <div class="band js-only">
+          <p class="band__title">¿Qué día te queda bien?</p>
+          <a class="btn btn--white" href="#cita">Elegir día y hora</a>
+        </div>
+      </section>
+
+      <section class="view page" id="tratamientos" data-view data-title="Tratamientos" aria-labelledby="treat-t">
+        <h1 class="page__title" id="treat-t" tabindex="-1">Tratamientos</h1>
+        <ul class="treats">
+          <include src="demos/esmalte-treatment.html" id="valoracion" name="Valoración" time="40 min" text="Revisión, conversación y un plan explicado paso a paso."></include>
+          <include src="demos/esmalte-treatment.html" id="limpieza" name="Limpieza" time="45 min" text="Retiro de placa y pulido, con recomendaciones para tu rutina en casa."></include>
+          <include src="demos/esmalte-treatment.html" id="restauracion" name="Restauración" time="50 min" text="Opciones para reparar piezas con desgaste o caries."></include>
+          <include src="demos/esmalte-treatment.html" id="ortodoncia" name="Ortodoncia" time="40 min" text="Primera consulta para conocer brackets y alineadores."></include>
+          <include src="demos/esmalte-treatment.html" id="ninos" name="Niños" time="40 min" text="Una primera visita pensada para conocer el lugar sin susto."></include>
+        </ul>
+      </section>
+
+      <section class="view page step js-only" id="cita" data-view data-step="service" data-title="Elige el tratamiento" aria-labelledby="s1-t">
+        <p class="step__n">Paso 1 de 4</p>
+        <h1 class="page__title" id="s1-t" tabindex="-1">¿Qué necesitas?</h1>
+        <form data-form="service" novalidate>
+          <fieldset class="options" aria-labelledby="s1-t">
+            <include src="demos/esmalte-option.html" id="valoracion" name="Valoración" time="40 min"></include>
+            <include src="demos/esmalte-option.html" id="limpieza" name="Limpieza" time="45 min"></include>
+            <include src="demos/esmalte-option.html" id="restauracion" name="Restauración" time="50 min"></include>
+            <include src="demos/esmalte-option.html" id="ortodoncia" name="Ortodoncia" time="40 min"></include>
+            <include src="demos/esmalte-option.html" id="ninos" name="Niños" time="40 min"></include>
+          </fieldset>
+          <p class="error" role="alert"></p>
+          <div class="step__nav"><a class="more" href="#inicio">Cancelar</a><button class="btn" type="submit">Continuar</button></div>
+        </form>
+      </section>
+
+      <section class="view page step js-only" id="cita-fecha" data-view data-step="date" data-title="Elige el día" aria-labelledby="s2-t">
+        <p class="step__n">Paso 2 de 4</p>
+        <h1 class="page__title" id="s2-t" tabindex="-1">¿Qué día?</h1>
+        <form data-form="date" novalidate>
+          <fieldset class="days" data-days aria-labelledby="s2-t"></fieldset>
+          <p class="error" role="alert"></p>
+          <div class="step__nav"><a class="more" href="#cita">Atrás</a><button class="btn" type="submit">Continuar</button></div>
+        </form>
+      </section>
+
+      <section class="view page step js-only" id="cita-hora" data-view data-step="time" data-title="Elige la hora" aria-labelledby="s3-t">
+        <p class="step__n">Paso 3 de 4</p>
+        <h1 class="page__title" id="s3-t" tabindex="-1">¿A qué hora?</h1>
+        <form data-form="time" novalidate>
+          <p class="step__hint"><span data-day></span>. Disponibilidad simulada.</p>
+          <fieldset class="times" data-times aria-labelledby="s3-t"></fieldset>
+          <p class="error" role="alert"></p>
+          <div class="step__nav"><a class="more" href="#cita-fecha">Atrás</a><button class="btn" type="submit">Continuar</button></div>
+        </form>
+      </section>
+
+      <section class="view page step js-only" id="cita-resumen" data-view data-step="review" data-title="Revisa tu cita" aria-labelledby="s4-t">
+        <p class="step__n">Paso 4 de 4</p>
+        <h1 class="page__title" id="s4-t" tabindex="-1">¿Todo claro?</h1>
+        <form data-form="review" novalidate>
+          <dl class="review">
+            <div><dt>Tratamiento</dt><dd data-r="service"></dd><dd><a href="#cita" aria-label="Cambiar tratamiento">Cambiar</a></dd></div>
+            <div><dt>Día</dt><dd data-r="date"></dd><dd><a href="#cita-fecha" aria-label="Cambiar día">Cambiar</a></dd></div>
+            <div><dt>Hora</dt><dd data-r="time"></dd><dd><a href="#cita-hora" aria-label="Cambiar hora">Cambiar</a></dd></div>
+          </dl>
+          <p class="step__hint">Esta demo no pide nombre, teléfono ni datos de salud. En tu web, ese paso iría aquí.</p>
+          <div class="step__nav"><a class="more" href="#cita-hora">Atrás</a><button class="btn" type="submit">Confirmar cita simulada</button></div>
+        </form>
+      </section>
+
+      <section class="view done js-only" id="listo" data-view data-title="Cita simulada" aria-labelledby="done-t">
+        <h1 class="page__title" id="done-t" tabindex="-1">Cita simulada.<br />Así de claro.</h1>
+        <p class="done__text"><strong data-done></strong> No se ha reservado nada y no guardamos ningún dato tuyo.</p>
+        <p class="done__actions">
+          <a class="btn btn--white" href="/#contacto">Quiero una web así</a>
+          <a class="more" href="#inicio">Volver al inicio</a>
+        </p>
+      </section>
+
+      <p class="nojs">La cita simulada necesita JavaScript.</p>
+    </main>
+
+    <footer class="foot">
+      <p class="foot__logo">Esmalte Claro</p>
+      <p>Marca y servicios ficticios; fotos generadas con IA. No es una clínica real. Demostración diseñada por <a href="/">Stiven Lux</a>.</p>
+    </footer>
+  </body>
+</html>
