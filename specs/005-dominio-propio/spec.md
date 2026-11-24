@@ -1,6 +1,6 @@
 # Spec 005 — Dominio propio: stivenlux.com en Cloudflare Pages
 
-Estado: APROBADA por el usuario (2026-11-24)
+Estado: IMPLEMENTADA y VALIDADA (2026-11-24); aprobada por el usuario el mismo día
 
 ## Objetivo
 Que la web de Stiven Lux viva solo en `https://stivenlux.com`, alojada en Cloudflare Pages (plan gratuito), y que los
@@ -55,5 +55,5 @@ comprueba en su móvil.
 - [x] T1. El usuario crea o abre Cloudflare y conecta GitHub; proyecto en Pages probado en su dirección `.pages.dev`.
 - [x] T2. Zona en Cloudflare y nameservers en Hostinger (usuario, guiado). Dominio, HTTPS y redirecciones (RF-1, 2).
 - [x] T3. `canonical`, `og:url` y `og:image` con sus tests (RF-3, 4). Revisión visual del usuario.
-- [ ] T4. Puerta, un @reviewer, commit y publicación, con permiso. Prueba en el móvil del usuario.
-- [ ] T5. Retirar Vercel (RF-5), con permiso.
+- [x] T4. Puerta, un @reviewer, commit y publicación, con permiso. Prueba en el móvil del usuario.
+- [x] T5. Retirar Vercel (RF-5), con permiso.
