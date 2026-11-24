@@ -1,6 +1,6 @@
 # Spec 004 — Modelos de demostración navegables
 
-Estado: aprobada con todas sus recomendaciones (usuario, 2026-11-24)
+Estado: implementada, publicada y aprobada por el usuario en su móvil (2026-11-24)
 
 ## Objetivo
 Que el visitante pueda entrar y usar webs reales hechas por Stiven Lux, no solo ver mockups. Se presentan como
@@ -52,4 +52,4 @@ Las tres demos se recorren de principio a fin en la web publicada, la puerta pas
 - [x] T2. Demo odontología (RF-3). Revisión visual del usuario.
 - [x] T3. Demo mantenimiento de aires acondicionados (RF-4). Revisión visual del usuario.
 - [x] T4. Hero y proyectos con las demos (RF-8).
-- [ ] T5 (puerta, reviewer y commit hechos; falta publicar). Puerta, un @reviewer y publicación con permiso.
+- [x] T5. Puerta, un @reviewer y publicación con permiso.
